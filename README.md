@@ -18,3 +18,9 @@ Big thank to the author(s) of these libraries
   2. Rename the `.zip` as `CypressCY8CMBR3116.zip`
   3. Arduino IDE 2 > Sketch > Library > Include Library > Add .ZIP Libray...
   4. Navigate to the .zip and select it to install the library.
+
+# Developing stage
+
+**Finished** configuration.  
+
+**Next stage** | start sensing and print something that makes some sort of sense

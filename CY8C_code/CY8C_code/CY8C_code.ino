@@ -1,6 +1,7 @@
 #include <CypressCY8CMBR3116.h>
 #include <Wire.h>
 
+<<<<<<< Updated upstream
 #define I2C_ADDRESS 0x51      // 硬體配置的 I2C 地址，預設是 0x51
 #define REQUEST_TIMEOUT 40    // 定義超時次數
 
@@ -76,4 +77,26 @@ void printError(uint8_t errorCode) {
             Serial.println("Unknown Wire Error");
             break;
     }
+=======
+//   -------------------------------------------
+//  / Official Configure Example but Modified /
+// -------------------------------------------
+
+#define I2C_ADDRESS 0x51     //I2C Address of the Cypress IC (0x37 is default)
+#define REQUEST_TIMEOUT 40   //After how many request is a Timeout triggered
+
+//Create an instance of the IC
+CY8CMBR3116 touchIC(I2C_ADDRESS, REQUEST_TIMEOUT);
+
+void setup()
+{
+    Serial.begin(9600);
+    Wire.begin(4, 5);
+    Serial.println("Start Programm");
+}
+
+void loop()
+{
+    
+>>>>>>> Stashed changes
 }

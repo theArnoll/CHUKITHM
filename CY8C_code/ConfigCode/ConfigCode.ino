@@ -17,6 +17,10 @@ void setup() {
     Wire.begin(4, 5);
     Serial.println("Start Programm");
     configueTouchIC();
+    Wire.beginTransmission(I2C_ADDRESS);
+    Wire.write(0x86);
+    Wire.write(0x02);
+    Serial.println(Wire.endTransmission());
 }
 
 void loop()

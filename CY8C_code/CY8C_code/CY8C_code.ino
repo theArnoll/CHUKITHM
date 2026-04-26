@@ -1,27 +1,38 @@
 #include <CypressCY8CMBR3116.h>
 #include <Wire.h>
 
-<<<<<<< Updated upstream
-#define I2C_ADDRESS 0x51      // 硬體配置的 I2C 地址，預設是 0x51
-#define REQUEST_TIMEOUT 40    // 定義超時次數
+//   -------------------------------------------
+//  / Official Configure Example but Modified /
+// -------------------------------------------
 
-// 創建 CY8CMBR3116 指令實例
+#define I2C_ADDRESS 0x51     //I2C Address of the Cypress IC (0x37 is default)
+#define REQUEST_TIMEOUT 40   //After how many request is a Timeout triggered
+
+// Create an instance of the IC
 CY8CMBR3116 touchIC(I2C_ADDRESS, REQUEST_TIMEOUT);
 
-void setup() {
+void setup()
+{
     Serial.begin(9600);
-    Wire.begin();
+    Wire.begin(4, 5);
+    Wire.beginTransmission(I2C_ADDRESS); // 呼叫 CY8CMBR3116 的預設位址
+    if (Wire.endTransmission() == 0) {
+        Serial.print("Device found");
+    }
+    delay(50);                    // 給予 50 毫秒的絕對清醒時間，讓它準備好
     Serial.println("Start Program");
 }
 
+//   -------------------------------------------
+
 void loop() {
     requestTouchStatus();
-    delay(500); // 延遲 0.5 秒以減少數據頻率
+    delay(1); // 延遲 0.5 秒以減少數據頻率
 }
 
 // 要求觸控狀態的函數
 void requestTouchStatus() {
-    Serial.println("Requesting touch status...");
+    // Serial.println("Requesting touch status...");
 
     uint8_t touchStatusBuffer[2];
     uint8_t error = touchIC.get_BUTTON_STAT(touchStatusBuffer);
@@ -35,22 +46,25 @@ void requestTouchStatus() {
 
 // 打印觸控狀態
 void printStatus(uint8_t *statusBuffer) {
-    Serial.println("Touch Status: ");
+    // Serial.println("Touch Status: ");
+
+    uint8_t pressed = statusBuffer[0];
+    Serial.print(pressed);
 
     // 假設有16個按鈕，每位代表一個按鈕的狀態（0未觸發，1已觸發）
-    for (int i = 0; i < 8; i++) {
-        uint8_t pressed = statusBuffer[0] >> i & 0b00000001;
-        Serial.print(pressed);
-        Serial.print(", ");
-    }
-    for (int i = 0; i < 7; i++) {
-        uint8_t pressed = statusBuffer[1] >> i & 0b00000001;
-        Serial.print(pressed);
-        Serial.print(", ");
-    }
+    // for (int i = 0; i < 8; i++) {
+    //     uint8_t pressed = statusBuffer[0] >> i & 0b00000001;
+    //     Serial.print(pressed);
+    //     Serial.print(", ");
+    // }
+    // for (int i = 0; i < 7; i++) {
+    //     uint8_t pressed = statusBuffer[1] >> i & 0b00000001;
+    //     Serial.print(pressed);
+    //     Serial.print(", ");
+    // }
 
     // 最後一位狀態
-    uint8_t pressed = statusBuffer[1] >> 7 & 0b00000001;
+    // uint8_t pressed = statusBuffer[1] >> 7 & 0b00000001;
     Serial.println();
 }
 
@@ -77,26 +91,4 @@ void printError(uint8_t errorCode) {
             Serial.println("Unknown Wire Error");
             break;
     }
-=======
-//   -------------------------------------------
-//  / Official Configure Example but Modified /
-// -------------------------------------------
-
-#define I2C_ADDRESS 0x51     //I2C Address of the Cypress IC (0x37 is default)
-#define REQUEST_TIMEOUT 40   //After how many request is a Timeout triggered
-
-//Create an instance of the IC
-CY8CMBR3116 touchIC(I2C_ADDRESS, REQUEST_TIMEOUT);
-
-void setup()
-{
-    Serial.begin(9600);
-    Wire.begin(4, 5);
-    Serial.println("Start Programm");
-}
-
-void loop()
-{
-    
->>>>>>> Stashed changes
 }

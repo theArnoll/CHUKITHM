@@ -1,10 +1,8 @@
 #include <CypressCY8CMBR3116.h>
 #include <Wire.h>
-#include <Keyborad.h>
+#include <SQUIDHID.h>
 
-//   -------------------------------------------
-//  / Official Configure Example but Modified /
-// -------------------------------------------
+SQUIDHID kb("CHUKITHM", "Arnoll Studio", 100);   // Here, we set the name to "ESP32-TEST", the manufacturer to "gargum", and the battery level to 100%
 
 #define I2C_ADDRESS 0x51     //I2C Address of the Cypress IC (0x37 is default)
 #define REQUEST_TIMEOUT 40   //After how many request is a Timeout triggered
@@ -12,12 +10,14 @@
 // Create an instance of the IC
 CY8CMBR3116 touchIC(I2C_ADDRESS, REQUEST_TIMEOUT);
 
-void setup()
-{
+void setup() {
+    kb.setAppearance(CYCLING_COMPUTER);
+    kb.begin();
     Serial.begin(9600);
     Wire.begin(4, 5);
     Wire.beginTransmission(I2C_ADDRESS); // 呼叫 CY8CMBR3116 的預設位址
-    if (Wire.endTransmission() == 0) {
+    if (Wire.endTransmission() == 0)
+    {
         Serial.print("Device found");
     }
     delay(50);                    // 給予 50 毫秒的絕對清醒時間，讓它準備好
@@ -30,30 +30,69 @@ void setup()
 //   -------------------------------------------
 
 // char keymap[8] = {  ',', '.' , 'p', 'y', 'g', 'c', 'r', 'l' };
-char keymap[8] = {  '.' , 'p', 'y', 'g', 'c', 'r' };
+NKROKey keymap[6] = {  KC_DOT, KC_P, KC_Y, KC_G, KC_C, KC_R };
 // char keymap[8] = { 'w', 'e', 'r', 't', 'u', 'i', 'o', 'p' };
+uint8_t lastStatus[2] = { 0, 0 };
 
 void loop() {
-    requestTouchStatus();
-    delay(1); // 延遲 0.5 秒以減少數據頻率
+    kb.update();
+    uint8_t *touchStatus;
+    touchStatus = requestTouchStatus();
+    if (    digitalRead(6) == LOW &&
+        ( !(lastStatus[0] == 0x55 && lastStatus[1] == 0x55 
+        && touchStatus[0] == 0xAA && touchStatus[1] == 0xAA))) {
+        {   for (int i = 0; i < 6; i++)
+            {   uint8_t pressed = touchStatus[0] >> i & 0b00000001;
+                if(pressed) kb.press(keymap[i]);
+                        else kb.release(keymap[i]);
+                Serial.print(", ");
+            }
+        }
+    }
+    lastStatus[0] = touchStatus[0]; lastStatus[1] = touchStatus[1];
+    delay(1);
 }
 
 // 要求觸控狀態的函數
-void requestTouchStatus() {
+uint8_t* requestTouchStatus()
+{
     // Serial.println("Requesting touch status...");
 
     uint8_t touchStatusBuffer[2];
     uint8_t error = touchIC.get_BUTTON_STAT(touchStatusBuffer);
 
-    if (error != 0) {
+    if (error != 0)
+    {
+        printError(error);
+        for (uint8_t re = 0; re < 2; re++)
+            touchStatusBuffer[re] = (touchStatusBuffer[re] == 0x55 ? 0xAA : 0x55);
+    }
+    // } else {
+    //     printStatus(touchStatusBuffer);
+    // }
+    return touchStatusBuffer;
+}
+
+/*
+// 要求觸控狀態的函數
+void requestTouchStatus()
+{
+    // Serial.println("Requesting touch status...");
+
+    uint8_t touchStatusBuffer[2];
+    uint8_t error = touchIC.get_BUTTON_STAT(touchStatusBuffer);
+
+    if (error != 0)
+    {
         printError(error);
     } else {
         printStatus(touchStatusBuffer);
     }
 }
-
+*/
 // 打印觸控狀態
-void printStatus(uint8_t *statusBuffer) {
+void printStatus(uint8_t *statusBuffer)
+{
     // Serial.println("Touch Status: ");
 
     // uint8_t pressed = statusBuffer[0];
@@ -61,51 +100,48 @@ void printStatus(uint8_t *statusBuffer) {
 
     // 假設有16個按鈕，每位代表一個按鈕的狀態（0未觸發，1已觸發）
     // Original         8
-    for (int i = 0; i < 6; i++) {
+    for (int i = 0; i < 6; i++)
+    {
         uint8_t pressed = statusBuffer[0] >> i & 0b00000001;
         Serial.print(pressed);
         Serial.print(", ");
     }
-    if (digitalRead(6) == LOW) { 
-        for (int i = 0; i < 6; i++) {
-            uint8_t pressed = statusBuffer[0] >> i & 0b00000001;
-            if(pressed) Keyboard.press(keymap[i]);
-                    else Keyboard.release(keymap[i]);
-            Serial.print(", ");
-        }
+    /* for (int i = 0; i < 7; i++)
+    {
+        uint8_t pressed = statusBuffer[1] >> i & 0b00000001;
+        Serial.print(pressed);
+        Serial.print(", ");
     }
-    // for (int i = 0; i < 7; i++) {
-    //     uint8_t pressed = statusBuffer[1] >> i & 0b00000001;
-    //     Serial.print(pressed);
-    //     Serial.print(", ");
-    // }
 
-    // 最後一位狀態
-    // uint8_t pressed = statusBuffer[1] >> 7 & 0b00000001;
+    最後一位狀態
+    uint8_t pressed = statusBuffer[1] >> 7 & 0b00000001; */
     Serial.println();
 }
 
 // 打印錯誤訊息
-void printError(uint8_t errorCode) {
-    Serial.println("Communication Error:");
-    switch (errorCode) {
+void printError(uint8_t errorCode)
+{
+    Serial.print("Communication Error ");
+    switch (errorCode)
+    {
         case 1:
-            Serial.println("Error 1: Data too long to fit in transmit buffer");
+            Serial.println("1: Data too long to fit in transmit buffer");
             break;
         case 2:
-            Serial.println("Error 2: Received NACK on transmit of address");
+            Serial.println("2: Received NACK on transmit of address");
             break;
         case 3:
-            Serial.println("Error 3: Received NACK on transmit of data");
+            Serial.println("3: Received NACK on transmit of data");
             break;
         case 4:
-            Serial.println("Error 4: Other Error");
+            Serial.println("4: Other Error");
             break;
         case 5:
-            Serial.println("Error 5: Timeout Error");
+            Serial.println("5: Timeout Error");
             break;
         default:
-            Serial.println("Unknown Wire Error");
+            Serial.print("Unknown: Unknown Wire Error ");
+            Serial.println(errorCode);
             break;
     }
 }

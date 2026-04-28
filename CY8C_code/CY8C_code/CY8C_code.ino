@@ -1,5 +1,6 @@
 #include <CypressCY8CMBR3116.h>
 #include <Wire.h>
+#include <Keyborad.h>
 
 //   -------------------------------------------
 //  / Official Configure Example but Modified /
@@ -20,10 +21,17 @@ void setup()
         Serial.print("Device found");
     }
     delay(50);                    // 給予 50 毫秒的絕對清醒時間，讓它準備好
+
+    pinMode(6, INPUT_PULLUP);
+
     Serial.println("Start Program");
 }
 
 //   -------------------------------------------
+
+// char keymap[8] = {  ',', '.' , 'p', 'y', 'g', 'c', 'r', 'l' };
+char keymap[8] = {  '.' , 'p', 'y', 'g', 'c', 'r' };
+// char keymap[8] = { 'w', 'e', 'r', 't', 'u', 'i', 'o', 'p' };
 
 void loop() {
     requestTouchStatus();
@@ -48,15 +56,24 @@ void requestTouchStatus() {
 void printStatus(uint8_t *statusBuffer) {
     // Serial.println("Touch Status: ");
 
-    uint8_t pressed = statusBuffer[0];
-    Serial.print(pressed);
+    // uint8_t pressed = statusBuffer[0];
+    // Serial.print(pressed);
 
     // 假設有16個按鈕，每位代表一個按鈕的狀態（0未觸發，1已觸發）
-    // for (int i = 0; i < 8; i++) {
-    //     uint8_t pressed = statusBuffer[0] >> i & 0b00000001;
-    //     Serial.print(pressed);
-    //     Serial.print(", ");
-    // }
+    // Original         8
+    for (int i = 0; i < 6; i++) {
+        uint8_t pressed = statusBuffer[0] >> i & 0b00000001;
+        Serial.print(pressed);
+        Serial.print(", ");
+    }
+    if (digitalRead(6) == LOW) { 
+        for (int i = 0; i < 6; i++) {
+            uint8_t pressed = statusBuffer[0] >> i & 0b00000001;
+            if(pressed) Keyboard.press(keymap[i]);
+                    else Keyboard.release(keymap[i]);
+            Serial.print(", ");
+        }
+    }
     // for (int i = 0; i < 7; i++) {
     //     uint8_t pressed = statusBuffer[1] >> i & 0b00000001;
     //     Serial.print(pressed);

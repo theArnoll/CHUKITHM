@@ -1,5 +1,9 @@
 # A touch controller based on a Japanese Arcade
 
+## This code can't work on Arduino Pro Micro (Leonardo) so far!
+
+Currently used malloc() function, but it's not working with Arduino.
+
 ## BOM
 
 1. CY8CMBR3116 w/ DIP convertion board x 1
@@ -12,7 +16,8 @@
    2. 560Ω x 1 / set
 3. IR LED
 4. IRM-3638 IR reciever
-5. ESP32-S3-N16R8 WROOM DevKit C x 1
+5. Arduino Pro Micro (or Micro / Leonardo) x 1
+   (Refer as "Arduino" below)
 
 ## Third Party Libraries
 
@@ -34,15 +39,15 @@ Big thank to the author(s) of these libraries
 
 ### Step
 
-1. Wire your CY8CMBR3116 well on breadboard. I²C SDA → Pin D4, I²C SCL → Pin D5. Make sure you've pulled these pins up with 4.7kΩ resistor.
-2. Connect your ESP32 to PC via USB cable.
+1. Wire your CY8CMBR3116 well on breadboard. I²C SDA → Pin D2, I²C SCL → Pin D3. Make sure you've pulled these pins up with 4.7kΩ resistor.
+2. Connect your Arduino to PC via USB cable.
 3. Upload [ConfigCode.ino](./CY8C_code/ConfigCode/ConfigCode.ino)
 4. Upload [CY8C_code.ino](./CY8C_code/CY8C_code/CY8C_code.ino)
 5. Open serial monitor and tap the touch pad.
 
 ### Enabling Keyboard Input
 
-Connect Pin 6 on your ESP32 to enable keyboard input.
+Connect Pin 6 on your Arduino to enable keyboard input.
 
 ## Touchpad Making Step
 
@@ -57,7 +62,7 @@ Make a pattern like below with conductive paint or copper tape:
 The inner line is the touch point, and the outter ring is ground. Solder wires to these to pins:
 
 - Touch pad → CS0 on CY8CMBR3116
-- Ground → GND on ESP32
+- Ground → GND on Arduino
 
 Beware that the space between touch pad and ground ring is the maximum distance between your finger and the touch pad that can be detected as touched.
 

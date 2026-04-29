@@ -1,8 +1,6 @@
 #include <CypressCY8CMBR3116.h>
 #include <Wire.h>
-#include <SQUIDHID.h>
-
-SQUIDHID kb("CHUKITHM", "Arnoll Studio", 100);   // Here, we set the name to "ESP32-TEST", the manufacturer to "gargum", and the battery level to 100%
+#include <HID-Project.h>
 
 #define I2C_ADDRESS 0x51     //I2C Address of the Cypress IC (0x37 is default)
 #define REQUEST_TIMEOUT 40   //After how many request is a Timeout triggered
@@ -11,10 +9,8 @@ SQUIDHID kb("CHUKITHM", "Arnoll Studio", 100);   // Here, we set the name to "ES
 CY8CMBR3116 touchIC(I2C_ADDRESS, REQUEST_TIMEOUT);
 
 void setup() {
-    kb.setAppearance(CYCLING_COMPUTER);
-    kb.begin();
     Serial.begin(9600);
-    Wire.begin(4, 5);
+    Wire.begin();  // SDA -> 2, SCL -> 3
     Wire.beginTransmission(I2C_ADDRESS); // 呼叫 CY8CMBR3116 的預設位址
     if (Wire.endTransmission() == 0)
     {
@@ -24,29 +20,45 @@ void setup() {
 
     pinMode(6, INPUT_PULLUP);
 
+    NKROKeyboard.begin();
     Serial.println("Start Program");
 }
 
 //   -------------------------------------------
 
 // char keymap[8] = {  ',', '.' , 'p', 'y', 'g', 'c', 'r', 'l' };
-NKROKey keymap[6] = {  KC_DOT, KC_P, KC_Y, KC_G, KC_C, KC_R };
+char keymap[6] = { ',', 'p', 'y', 'g', 'c', 'r' }; // TODO
 // char keymap[8] = { 'w', 'e', 'r', 't', 'u', 'i', 'o', 'p' };
 uint8_t lastStatus[2] = { 0, 0 };
 
 void loop() {
-    kb.update();
-    uint8_t *touchStatus;
-    touchStatus = requestTouchStatus();
+    uint8_t* touchStatus = requestTouchStatus();
+    uint8_t theStatus[2]; theStatus[0] = touchStatus[0]; theStatus[1] = touchStatus[1]; 
+    Serial.println(touchStatus[0]);
+    for (int i = 0; i < 6; i++)
+    {
+        uint8_t pressed = theStatus[0] >> i & 0b00000001;
+        Serial.print(pressed);
+        Serial.print(". ");
+    }
     if (    digitalRead(6) == LOW &&
         ( !(lastStatus[0] == 0x55 && lastStatus[1] == 0x55 
         && touchStatus[0] == 0xAA && touchStatus[1] == 0xAA))) {
         {   for (int i = 0; i < 6; i++)
-            {   uint8_t pressed = touchStatus[0] >> i & 0b00000001;
-                if(pressed) kb.press(keymap[i]);
-                        else kb.release(keymap[i]);
-                Serial.print(", ");
+            {   Serial.print("|");
+                uint8_t pressed = touchStatus[0] >> i & 0b00000001;
+                if(pressed)
+                {
+                    NKROKeyboard.add(keymap[i]);
+                    Serial.print("X");
+                }
+                else
+                {
+                    NKROKeyboard.release(keymap[i]);
+                    Serial.print("O");
+                }
             }
+            Serial.print("|");
         }
     }
     lastStatus[0] = touchStatus[0]; lastStatus[1] = touchStatus[1];
@@ -58,7 +70,8 @@ uint8_t* requestTouchStatus()
 {
     // Serial.println("Requesting touch status...");
 
-    uint8_t touchStatusBuffer[2];
+    // uint8_t touchStatusBuffer[2];
+    uint8_t* touchStatusBuffer = (uint8_t*)malloc(2 * sizeof(uint8_t));
     uint8_t error = touchIC.get_BUTTON_STAT(touchStatusBuffer);
 
     if (error != 0)
@@ -66,10 +79,10 @@ uint8_t* requestTouchStatus()
         printError(error);
         for (uint8_t re = 0; re < 2; re++)
             touchStatusBuffer[re] = (touchStatusBuffer[re] == 0x55 ? 0xAA : 0x55);
+    } else {
+        printStatus(touchStatusBuffer);
     }
-    // } else {
-    //     printStatus(touchStatusBuffer);
-    // }
+
     return touchStatusBuffer;
 }
 

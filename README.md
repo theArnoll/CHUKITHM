@@ -1,9 +1,5 @@
 # A touch controller based on a Japanese Arcade
 
-## This code can't work on Arduino Pro Micro (Leonardo) so far!
-
-Currently used malloc() function, but it's not working with Arduino.
-
 ## BOM
 
 1. CY8CMBR3116 w/ DIP convertion board x 1

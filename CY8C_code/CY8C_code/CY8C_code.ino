@@ -12,10 +12,7 @@ void setup() {
     Serial.begin(9600);
     Wire.begin();  // SDA -> 2, SCL -> 3
     Wire.beginTransmission(I2C_ADDRESS); // 呼叫 CY8CMBR3116 的預設位址
-    if (Wire.endTransmission() == 0)
-    {
-        Serial.print("Device found");
-    }
+    if (Wire.endTransmission() == 0) Serial.print("Device found");
     delay(50);                    // 給予 50 毫秒的絕對清醒時間，讓它準備好
 
     pinMode(6, INPUT_PULLUP);
@@ -27,51 +24,46 @@ void setup() {
 //   -------------------------------------------
 
 // char keymap[8] = {  ',', '.' , 'p', 'y', 'g', 'c', 'r', 'l' };
-char keymap[6] = { ',', 'p', 'y', 'g', 'c', 'r' }; // TODO
+char keymap[6] = { ',', 'p', 'y', 'g', 'c', 'r' };
 // char keymap[8] = { 'w', 'e', 'r', 't', 'u', 'i', 'o', 'p' };
 uint8_t lastStatus[2] = { 0, 0 };
 
 void loop() {
-    uint8_t* touchStatus = requestTouchStatus();
-    uint8_t theStatus[2]; theStatus[0] = touchStatus[0]; theStatus[1] = touchStatus[1]; 
-    Serial.println(touchStatus[0]);
+    uint8_t touchStatus[2];
+    requestTouchStatus(touchStatus);
     for (int i = 0; i < 6; i++)
     {
-        uint8_t pressed = theStatus[0] >> i & 0b00000001;
+        uint8_t pressed = touchStatus[0] >> i & 0b00000001;
         Serial.print(pressed);
         Serial.print(". ");
     }
     if (    digitalRead(6) == LOW &&
         ( !(lastStatus[0] == 0x55 && lastStatus[1] == 0x55 
-        && touchStatus[0] == 0xAA && touchStatus[1] == 0xAA))) {
-        {   for (int i = 0; i < 6; i++)
-            {   Serial.print("|");
-                uint8_t pressed = touchStatus[0] >> i & 0b00000001;
-                if(pressed)
-                {
-                    NKROKeyboard.add(keymap[i]);
-                    Serial.print("X");
-                }
-                else
-                {
-                    NKROKeyboard.release(keymap[i]);
-                    Serial.print("O");
-                }
+        && touchStatus[0] == 0xAA && touchStatus[1] == 0xAA)))
+    {
+        for (int i = 0; i < 6; i++)
+        {   Serial.print("|");
+            uint8_t pressed = touchStatus[0] >> i & 0b00000001;
+            if(pressed)
+            {
+                NKROKeyboard.add(keymap[i]);
+                Serial.print("X");
             }
-            Serial.print("|");
+            else
+            {
+                NKROKeyboard.release(keymap[i]);
+                Serial.print("O");
+            }
         }
+        Serial.print("|");
     }
     lastStatus[0] = touchStatus[0]; lastStatus[1] = touchStatus[1];
     delay(1);
 }
 
-// 要求觸控狀態的函數
-uint8_t* requestTouchStatus()
+void requestTouchStatus(uint8_t statusStorage[2])
 {
-    // Serial.println("Requesting touch status...");
-
-    // uint8_t touchStatusBuffer[2];
-    uint8_t* touchStatusBuffer = (uint8_t*)malloc(2 * sizeof(uint8_t));
+    uint8_t touchStatusBuffer[2];
     uint8_t error = touchIC.get_BUTTON_STAT(touchStatusBuffer);
 
     if (error != 0)
@@ -79,39 +71,19 @@ uint8_t* requestTouchStatus()
         printError(error);
         for (uint8_t re = 0; re < 2; re++)
             touchStatusBuffer[re] = (touchStatusBuffer[re] == 0x55 ? 0xAA : 0x55);
-    } else {
-        printStatus(touchStatusBuffer);
     }
-
-    return touchStatusBuffer;
-}
-
-/*
-// 要求觸控狀態的函數
-void requestTouchStatus()
-{
-    // Serial.println("Requesting touch status...");
-
-    uint8_t touchStatusBuffer[2];
-    uint8_t error = touchIC.get_BUTTON_STAT(touchStatusBuffer);
-
-    if (error != 0)
+    else
     {
-        printError(error);
-    } else {
+        Serial.print(" ");
         printStatus(touchStatusBuffer);
     }
+
+    statusStorage[0] = touchStatusBuffer[0];
+    statusStorage[1] = touchStatusBuffer[1];
 }
-*/
-// 打印觸控狀態
+
 void printStatus(uint8_t *statusBuffer)
 {
-    // Serial.println("Touch Status: ");
-
-    // uint8_t pressed = statusBuffer[0];
-    // Serial.print(pressed);
-
-    // 假設有16個按鈕，每位代表一個按鈕的狀態（0未觸發，1已觸發）
     // Original         8
     for (int i = 0; i < 6; i++)
     {

@@ -8,13 +8,14 @@
 #define I2C_ADDRESS 0x37     //I2C Address of the Cypress IC (0x37 is default)
 #define REQUEST_TIMEOUT 40   //After how many request is a Timeout triggered
 #define NEW_I2C_ADDRESS 0x51 //I2C Address after programm. IC needs to be reseted for changes to apply
+#define LED_BUILTIN 10
 
 //Create an instance of the IC
 CY8CMBR3116 touchIC(I2C_ADDRESS, REQUEST_TIMEOUT);
 
 void setup() {
     Serial.begin(9600);
-    Wire.begin(4, 5);
+    Wire.begin();
     Serial.println("Start Programm");
     configueTouchIC();
     Wire.beginTransmission(I2C_ADDRESS);
@@ -83,8 +84,8 @@ uint8_t configureSensors() {  // SENSOR_EN, FFS_EN, SENSIVITY, THRESHOLD
 
     Serial.println("Set FFS_EN settings");
     //Enables/Disables FFS
-    SENSOR_0_7 = 0b11111111;   //Configures sensor enabled MSB = 7 LSB = 0
-    SENSOR_8_15 = 0b11111111;  //Configures sensor enabled MSB = 15 LSB = 8
+    SENSOR_0_7 = 0x00;   //Configures sensor enabled MSB = 7 LSB = 0
+    SENSOR_8_15 = 0x00;  //Configures sensor enabled MSB = 15 LSB = 8
 
     //Sends the databuffer to the touch IC
     uint8_t SENSOR_FFS_BUFFER[2] = { SENSOR_0_7, SENSOR_8_15 };
@@ -93,7 +94,8 @@ uint8_t configureSensors() {  // SENSOR_EN, FFS_EN, SENSIVITY, THRESHOLD
     //when something went wrong return the error
     if (error != 0) {
         return error;
-    }
+    } else digitalWrite(10, 1);
+    
 
     Serial.println("Set SENSITIVITY settings");
     //Sets the Sensitivity for each sensor

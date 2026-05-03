@@ -5,15 +5,19 @@
 #define I2C_ADDRESS 0x51     //I2C Address of the Cypress IC (0x37 is default)
 #define REQUEST_TIMEOUT 40   //After how many request is a Timeout triggered
 
-// Create an instance of the IC
 CY8CMBR3116 touchIC(I2C_ADDRESS, REQUEST_TIMEOUT);
 
 void setup() {
-    Serial.begin(9600);
-    Wire.begin();  // SDA -> 2, SCL -> 3
-    Wire.beginTransmission(I2C_ADDRESS); // 呼叫 CY8CMBR3116 的預設位址
+    Serial.begin(115200);
+    Wire.begin();   // SDA -> 2, SCL -> 3
+    Wire.setClock(400000);  // 400kHz I²C fast mode
+
+    Wire.beginTransmission(I2C_ADDRESS);
     if (Wire.endTransmission() == 0) Serial.print("Device found");
     delay(50);                    // 給予 50 毫秒的絕對清醒時間，讓它準備好
+
+    pinMode(10, OUTPUT);
+    digitalWrite(10, 0);
 
     pinMode(6, INPUT_PULLUP);
 
@@ -23,8 +27,7 @@ void setup() {
 
 //   -------------------------------------------
 
-// char keymap[8] = {  ',', '.' , 'p', 'y', 'g', 'c', 'r', 'l' };
-char keymap[6] = { ',', 'p', 'y', 'g', 'c', 'r' };
+char keymap[6] = { 'e', 'r', 't', 'u', 'i', 'o' };
 // char keymap[8] = { 'w', 'e', 'r', 't', 'u', 'i', 'o', 'p' };
 uint8_t lastStatus[2] = { 0, 0 };
 
@@ -58,7 +61,6 @@ void loop() {
         Serial.print("|");
     }
     lastStatus[0] = touchStatus[0]; lastStatus[1] = touchStatus[1];
-    delay(1);
 }
 
 void requestTouchStatus(uint8_t statusStorage[2])

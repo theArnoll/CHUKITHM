@@ -25,6 +25,7 @@ Big thank to the author(s) of these libraries
   2. Rename the `.zip` as `CypressCY8CMBR3116.zip`
   3. Arduino IDE 2 > Sketch > Library > Include Library > Add .ZIP Libray...
   4. Navigate to the .zip and select it to install the library.
+- HID-Project
 
 ## Usage
 
@@ -68,11 +69,11 @@ Beware that the space between touch pad and ground ring is the maximum distance 
 
 - Configuration
 - Start sensing and print something that makes some sort of sense (≈ MVP)
+- Introduce `HID-Project.h`
 
 ### To do
 
 - Test multiple buttons
-- Introduce `Keyboard.h`
 
 ## AI Usage & Attribution
 

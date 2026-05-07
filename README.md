@@ -30,7 +30,7 @@ Big thank to the author(s) of these libraries
 ## Sensing method idea and PCB and dimensions ref (Japanese)
 
 [Sensing method](https://x.com/QmanEnobikto/status/2049293495903629316)  
-[Entire dimensions and 情報](https://mizucoffee.blogspot.com/2018/05/1-chunithm.html) (Blog, multiple pages)  
+[Full dimensions and informations](https://mizucoffee.blogspot.com/2018/05/1-chunithm.html) (Blog, multiple pages)  
 [Touch panel length](https://detail.chiebukuro.yahoo.co.jp/qa/question_detail/q14172146159)  
 
 
@@ -70,15 +70,25 @@ Beware that the space between touch pad and ground ring is the maximum distance 
 
 ## Development stage
 
-### Finished
+- [X] Configuration
+- [X] Start sensing and print something that makes some sort of sense (≈ MVP)
+- [X] Introduce `HID-Project.h`
+- [X] Test multiple buttons
+- [X] Test IR Code
+- [ ] Improve latency
+- [ ] Finish IR Code
+- [ ] Print and test PCB
+- [ ] Finalize PCB design
+      Integrating CY8CMBR3116 the IC itself to the PCB and include Arduino Pro Micro to the PCB itself.
+      Find the solution of IR sensing connection to the motherboard.
+- [ ] Finalize the case
+- [ ] Refine the README and documents and Public the Repo
+   - [ ] Upload photos and closesource pictures to Imgur
+   - [ ] Document the usage of CY8CMBR3116 in the same or another repo
+   - [ ] Public the repo
+   - [ ] Refine the final README
 
-- Configuration
-- Start sensing and print something that makes some sort of sense (≈ MVP)
-- Introduce `HID-Project.h`
-
-### To do
-
-- Test multiple buttons
+---
 
 ## AI Usage & Attribution
 

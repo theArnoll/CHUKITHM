@@ -9,7 +9,7 @@
    4. 4.7kΩ x 2
 2. Capacitive touch pad x 1 set (for now)
    1. Double side conductive copper tape (making how-to look below)
-   2. 560Ω x 1 / set
+   2. 560Ω x 6 / set
 3. IR LED
 4. IRM-3638 IR reciever
 5. Arduino Pro Micro (or Micro / Leonardo) x 1
@@ -26,6 +26,13 @@ Big thank to the author(s) of these libraries
   3. Arduino IDE 2 > Sketch > Library > Include Library > Add .ZIP Libray...
   4. Navigate to the .zip and select it to install the library.
 - HID-Project
+
+## Sensing method idea and PCB and dimensions ref (Japanese)
+
+[Sensing method](https://x.com/QmanEnobikto/status/2049293495903629316)  
+[Entire dimensions and 情報](https://mizucoffee.blogspot.com/2018/05/1-chunithm.html) (Blog, multiple pages)  
+[Touch panel length](https://detail.chiebukuro.yahoo.co.jp/qa/question_detail/q14172146159)  
+
 
 ## Usage
 
@@ -48,17 +55,15 @@ Connect Pin 6 on your Arduino to enable keyboard input.
 
 ## Touchpad Making Step
 
-Make a pattern like below with conductive paint or copper tape:
+Prepare a wooden board, print the image below that need to ensure the thickness of black line in the image are 8mm, and paste the paper with white glue.
 
-```
-┌───────┐
-│  ───  │
-└───────┘
-```
+![./Images/MultipleButtonTest/MultipleButtonTest.png](./Images/MultipleButtonTest/MultipleButtonTest.png)
 
-The inner line is the touch point, and the outter ring is ground. Solder wires to these to pins:
+Choose one of the designs to test the result. The sticks in the middle are touch buttons, and the outter ring is ground. The 6 touch buttons is good for playing rhythm games on PC.
 
-- Touch pad → CS0 on CY8CMBR3116
+After you decided the pattern you want to test, cover the black area with 8mm width copper tape and solder wires to these to pins:
+
+- Touch buttons → CS0 ~ CS5 on CY8CMBR3116 via a 560Ω resistor. (CS0 ~ CS7 if you choose 8 buttons one)
 - Ground → GND on Arduino
 
 Beware that the space between touch pad and ground ring is the maximum distance between your finger and the touch pad that can be detected as touched.

@@ -16,10 +16,14 @@ void setup() {
     if (Wire.endTransmission() == 0) Serial.print("Device found");
     delay(50);                    // 給予 50 毫秒的絕對清醒時間，讓它準備好
 
+    // TODO: Address 0x4f bit 5:4 BUTTON_SLD_ARST -> 0 (Auto-reset disabled)
+    // TODO: Address 0x52 REFRESH_CTRL -> 1 (REFRESH_INTERVAL = Scan period -> 20ms)
+    // TODO: Address 0x55 STATE_TIMEOUT -> 63 (TIMEOUT = Switch to "Look for touch mode" -> 63ms (Max))
+
     pinMode(10, OUTPUT);
     digitalWrite(10, 0);
-
-    pinMode(6, INPUT_PULLUP);
+    pinMode(7, INPUT_PULLUP);
+    pinMode(8, INPUT_PULLUP);
 
     NKROKeyboard.begin();
     Serial.println("Start Program");
@@ -34,32 +38,37 @@ uint8_t lastStatus[2] = { 0, 0 };
 void loop() {
     uint8_t touchStatus[2];
     requestTouchStatus(touchStatus);
-    for (int i = 0; i < 6; i++)
+
+    if(digitalRead(7) == LOW)
     {
-        uint8_t pressed = touchStatus[0] >> i & 0b00000001;
-        Serial.print(pressed);
-        Serial.print(". ");
-    }
-    if (    digitalRead(6) == LOW &&
-        ( !(lastStatus[0] == 0x55 && lastStatus[1] == 0x55 
-        && touchStatus[0] == 0xAA && touchStatus[1] == 0xAA)))
-    {
+        Serial.print("| ");
         for (int i = 0; i < 6; i++)
-        {   Serial.print("|");
+        {
             uint8_t pressed = touchStatus[0] >> i & 0b00000001;
-            if(pressed)
-            {
-                NKROKeyboard.add(keymap[i]);
-                Serial.print("X");
-            }
-            else
-            {
-                NKROKeyboard.release(keymap[i]);
-                Serial.print("O");
+            Serial.print(pressed);
+            Serial.print(" | ");
+        }   Serial.println();
+    }
+    
+    // if (toggleStarted && status != warning && touchStatus.changed()) send key press accordingly
+    if (    digitalRead(8) == LOW &&
+        ( !(lastStatus[0] == 0x55 && lastStatus[1] == 0x55 
+        && touchStatus[0] == 0xAA && touchStatus[1] == 0xAA))
+        && (lastStatus[0] != touchStatus[0] || lastStatus[1] != touchStatus[1]) )
+    {   for (int i = 0; i < 6; i++)
+        {   uint8_t pressed = touchStatus[0] >> i & 0b00000001, lastPressed = lastStatus[0] >> i & 0b00000001;
+            if(pressed && (pressed != lastPressed)) {NKROKeyboard.add(keymap[i]); Serial.println(i);}
+            else {
+                if(pressed != lastPressed)
+                {
+                    NKROKeyboard.release(keymap[i]);
+                    Serial.print("-"); Serial.println(i);
+                }
             }
         }
-        Serial.print("|");
     }
+
+    NKROKeyboard.send();
     lastStatus[0] = touchStatus[0]; lastStatus[1] = touchStatus[1];
 }
 
@@ -74,11 +83,10 @@ void requestTouchStatus(uint8_t statusStorage[2])
         for (uint8_t re = 0; re < 2; re++)
             touchStatusBuffer[re] = (touchStatusBuffer[re] == 0x55 ? 0xAA : 0x55);
     }
-    else
-    {
-        Serial.print(" ");
-        printStatus(touchStatusBuffer);
-    }
+    // else
+    // {
+    //     printStatus(touchStatusBuffer);
+    // }
 
     statusStorage[0] = touchStatusBuffer[0];
     statusStorage[1] = touchStatusBuffer[1];

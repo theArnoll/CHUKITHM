@@ -25,13 +25,21 @@ Big thank to the author(s) of these libraries
   2. Rename the `.zip` as `CypressCY8CMBR3116.zip`
   3. Arduino IDE 2 > Sketch > Library > Include Library > Add .ZIP Libray...
   4. Navigate to the .zip and select it to install the library.
+  5. !IMPORTANT! Current version of this library need to edit the .cpp file to be able to run correctly. Here's how to fix:
+      1. Navigate to line 699, where `uint8_t CY8CMBR3116::activateSettings() {` is at
+      2. After `uint8_t error = calculateCRC();`, add a line and write `delay(250);`.
+      3. After `error = applyRegister();` and `error = resetIC();`, add a line and write `delay(200);`.
+
+      This will increase the possibility of the setting being activated if nothing seem to go wrong.
+
 - HID-Project
 
 ## Sensing method idea and PCB and dimensions ref (Japanese)
 
-[Sensing method](https://x.com/QmanEnobikto/status/2049293495903629316)  
 [Full dimensions and informations](https://mizucoffee.blogspot.com/2018/05/1-chunithm.html) (Blog, multiple pages)  
-[Touch panel length](https://detail.chiebukuro.yahoo.co.jp/qa/question_detail/q14172146159)  
+[Detailed dimensions and sensing method](https://gist.github.com/mizucoffee/2f6263656d174fb2284a9e49c44bfabc)  
+[Touch panel (ground slider) length](https://detail.chiebukuro.yahoo.co.jp/qa/question_detail/q14172146159)  
+[Sensing method](https://x.com/QmanEnobikto/status/2049293495903629316) (Newer information as confirmation)  
 
 
 ## Usage
@@ -75,7 +83,7 @@ Beware that the space between touch pad and ground ring is the maximum distance 
 - [X] Introduce `HID-Project.h`
 - [X] Test multiple buttons
 - [X] Test IR Code
-- [ ] Improve latency
+- [ ] Improve latency → Latency is now improved from around 70~75ms to around 40 ms. (Updated 2026 May 11, 1st update)
 - [ ] Finish IR Code
 - [ ] Print and test PCB
 - [ ] Finalize PCB design

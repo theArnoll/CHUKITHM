@@ -16,6 +16,10 @@ CY8CMBR3116 touchIC(I2C_ADDRESS, REQUEST_TIMEOUT);
 void setup() {
     Serial.begin(115200);
     Wire.begin();
+    Wire.setClock(400000);  // 400kHz I²C fast mode
+    while (!Serial) {
+        ;  // Wait for Serial be ready, or else it won't work
+    }
     Serial.println("Start Program");
     configueTouchIC();
     Wire.beginTransmission(I2C_ADDRESS);
@@ -112,9 +116,42 @@ uint8_t configureSensors() {  // SENSOR_EN, FFS_EN, SENSIVITY, THRESHOLD
     }
 
     Serial.println("Set THRESHOLD settings");
-    //Send thrshold settings to touch IC
+    //Send threshold settings to touch IC
     uint8_t THRESHOLD_BUFFER[16] = { 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160 };  //From index 0-15 the threshold value for sensor 0-15
     error = touchIC.set_THRESHOLD(THRESHOLD_BUFFER);
+    if (error != 0) {
+        return error;
+    }
+
+    // Below: Other settings that are not in the official example but are recommended to be set for better performance and user experience
+
+    Serial.println("+ Set REFRESH_CTRL settings");
+    uint8_t val_REFRESH = 0x01; // 20ms scan period / refresh period
+    error = touchIC.set_REFRESH_CTRL(&val_REFRESH);
+    if (error != 0) {
+        return error;
+    }
+
+    Serial.println("+ Set DEVICE_CFG2 settings (Disableing button auto-reset)");
+    uint8_t val_CFG2 = 0b00001000; // Disable button auto-reset (default 1 is going to make the button report as untouched even if the finger is still touching after 5 seconds)
+    error = touchIC.set_DEVICE_CFG2(&val_CFG2);
+    if (error != 0) {
+        return error;
+    }
+
+    Serial.println("+ Set SENSOR_DEBOUNCE settings");
+    uint8_t val_DEBOUNCE = 0x01; // Minimize debounce (the defaut 3 is likely to triple the 20ms refresh period, which is going to increase the latency.)
+    error = touchIC.set_SENSOR_DEBOUNCE(&val_DEBOUNCE);
+    if (error != 0) {
+        return error;
+    }
+
+    Serial.println("+ Set STATE_TIMEOUT settings");
+    uint8_t val_TIMEOUT = 0x3F; // Keep wake for 63 second
+    error = touchIC.set_STATE_TIMEOUT(&val_TIMEOUT);
+    if (error != 0) {
+        return error;
+    }
 
     //Return the final error Code
     return error;

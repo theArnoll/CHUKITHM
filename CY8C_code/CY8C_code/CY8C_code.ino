@@ -18,40 +18,6 @@ void setup() {
     Wire.beginTransmission(I2C_ADDRESS);
     if (Wire.endTransmission() == 0) Serial.println("Device found");
     delay(50);  // 50ms prepare wake time. To wake up the IC.
-    
-    uint8_t val_CFG2 = 0b00001000; // Disable button auto-reset (default 1 is going to make the button report as untouched even if the finger is still touching after 5 seconds)
-    uint8_t tmp = touchIC.set_DEVICE_CFG2(&val_CFG2);
-    if(tmp){ Serial.print("set_DEVICE_CFG2: "); printError(tmp); digitalWrite(10, 1); }
-    uint8_t buf[1];
-    Serial.print("DEVICE_CFG2: ");
-    touchIC.get_DEVICE_CFG2(buf);
-    Serial.println(buf[0]);
-
-    uint8_t val_REFRESH = 0x01; // 20ms scan period / refresh period
-    tmp = touchIC.set_REFRESH_CTRL(&val_REFRESH);
-    if(tmp){ Serial.print("set_REFRESH_CTRL: "); printError(tmp); digitalWrite(10, 1); }
-    Serial.print("REFRESH_CTRL: ");
-    touchIC.get_REFRESH_CTRL(buf);
-    Serial.println(buf[0]);
-
-    uint8_t val_DEBOUNCE = 0x01; // Minimize debounce (the defaut 3 is likely to triple the 20ms refresh period, which is going to increase the latency.)
-    tmp = touchIC.set_SENSOR_DEBOUNCE(&val_DEBOUNCE);
-    if(tmp){ Serial.print("set_SENSOR_DEBOUNCE: "); printError(tmp); digitalWrite(10, 1); }
-    Serial.print("SENSOR_DEBOUNCE: ");
-    touchIC.get_SENSOR_DEBOUNCE(buf);
-    Serial.println(buf[0]);
-
-    uint8_t val_TIMEOUT = 0x3F; // Keep wake for 63 second
-    tmp = touchIC.set_STATE_TIMEOUT(&val_TIMEOUT);
-    if(tmp){ Serial.print("set_STATE_TIMEOUT: "); printError(tmp); digitalWrite(10, 1); }
-    Serial.print("STATE_TIMEOUT: ");
-    touchIC.get_STATE_TIMEOUT(buf);
-    Serial.println(buf[0]);
-
-    tmp = touchIC.activateSettings(); // I may not need to comment this, right?
-    if(tmp){ Serial.print("Activate Settings: "); printError(tmp); digitalWrite(10, 1); }
-
-    delay(100);
 
     pinMode(10, OUTPUT);
     digitalWrite(10, 0);

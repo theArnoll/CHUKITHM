@@ -76,6 +76,19 @@ After you decided the pattern you want to test, cover the black area with 8mm wi
 
 Beware that the space between touch pad and ground ring is the maximum distance between your finger and the touch pad that can be detected as touched.
 
+## Program flow chart
+
+Only Chinese version is available at the time.
+
+### Config
+
+![Images/FlowChart/Config_Code.svg](Images/FlowChart/Config_Code.svg)
+
+### Running code (`CY8C_code.ino`)
+
+![Images/FlowChart/CY8C_Code_setup.svg](Images/FlowChart/CY8C_Code_setup.svg)
+![Images/FlowChart/CY8C_Code_loop.svg](Images/FlowChart/CY8C_Code_loop.svg)
+
 ## Development stage
 
 - [X] Configuration
@@ -85,7 +98,7 @@ Beware that the space between touch pad and ground ring is the maximum distance 
 - [X] Test IR Code
 - [ ] Improve latency → Latency is now improved from around 70~75ms to around 40 ms. (Updated 2026 May 11, 1st update)
 - [ ] Finish IR Code
-- [ ] Print and test PCB
+- [X] Print and test PCB
 - [ ] Finalize PCB design
       Integrating CY8CMBR3116 the IC itself to the PCB and include Arduino Pro Micro to the PCB itself.
       Find the solution of IR sensing connection to the motherboard.

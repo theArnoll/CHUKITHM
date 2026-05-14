@@ -1,0 +1,8 @@
+﻿Designator,Footprint,Quantity,Value,LCSC Part #
+"C.1Μ_2, C2.2NF",0603,2,C_0603_1608Metric_Pad1.08x0.95mm_HandSolder,C15849
+C.1Μ,0603,1,C_0603_1608Metric_Pad1.08x0.95mm_HandSolder,C1525
+C1Μ,0603,1,C_0603_1608Metric_Pad1.08x0.95mm_HandSolder,C52923
+CONNECTION,PinHeader_1x04_P2.54mm_Vertical,1,PinHeader_1x04_P2.54mm_Vertical,
+"R4.7K_2, R4.7K",0603,2,R_0603_1608Metric_Pad0.98x0.95mm_HandSolder,C25900
+"R560_16, R560_15, R560_14, R560_13, R560_12, R560_11, R560_10, R560_9, R560_8, R560_7, R560_6, R560_5, R560_4, R560_3, R560_2, R560",0603,16,R_0603_1608Metric_Pad0.98x0.95mm_HandSolder,C23204
+REFFC,Amphenol_F32R-1A7x1-11010_1x10-1MP_P0.5mm_Horizontal,1,Amphenol_F32R-1A7x1-11010_1x10-1MP_P0.5mm_Horizontal,C3169434

@@ -1,1 +1,6 @@
 /PCB/TestPCB/TestPCB-backups
+/PCB/TestPCB/PCB/Mother/A/Gerber
+/PCB/TestPCB/PCB/Mother/B/Gerber
+/PCB/TestPCB/PCB/Child/A/Gerber
+/PCB/TestPCB/PCB/Child/B/Gerber
+.DS_Store

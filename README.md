@@ -2,18 +2,45 @@
 
 ## BOM
 
-1. CY8CMBR3116 w/ DIP convertion board x 1
-   1. 0.1uF x 2
-   2. 1uF x 1
-   3. 2.2nF x 1
-   4. 4.7kΩ x 2
-2. Capacitive touch pad x 1 set (for now)
+<details>
+
+<summary>Using test PCB</summary>
+
+1. Testing PCB [motherboard type B](./PCB/TestPCB/TestMotherboardB.kicad_pcb) × 1
+1. Testing PCB [childboard type B](./PCB/TestPCB/TestChildboardB.kicad_pcb) × 1
+   1. CY8CMBR3116 w/ [DIP convertion board](./PCB/CY8CMBR3116_PCB/CY8CMBR3116_PCB.kicad_pro) × 1 `! The KiCad prject is created with KiCad version 9 or 8.`
+   2. 0.1uF × 2
+   3. 1uF × 1
+   4. 2.2nF X7R × 1
+   5. 4.7kΩ × 2
+1. Capacitive touch pad × 1 set (for now)
    1. Double side conductive copper tape (making how-to look below)
-   2. 560Ω x 6 / set
-3. IR LED
-4. IRM-3638 IR reciever
-5. Arduino Pro Micro (or Micro / Leonardo) x 1
-   (Refer as "Arduino" below)
+   2. 560Ω × 6 / set
+2. IR LED `! Function haven't implented yet`
+3. IRM-3638 IR reciever `! Function haven't implented yet`
+4. RP2040 Zero × 1
+   (Refer as RP2040 below)
+
+</details>
+
+<details>
+
+<summary>Using prototype touchpad</summary>
+
+1. CY8CMBR3116 w/ DIP convertion board × 1
+   1. 0.1uF × 2
+   2. 1uF × 1
+   3. 2.2nF × 1
+   4. 4.7kΩ × 2
+2. Capacitive touch pad × 1 set
+   1. Double side conductive copper tape (making how-to look below)
+   2. 560Ω × 6/set or 8/set according to [which you choose](#prototype-touchpad-making-step)
+3. IR LED `! Function haven't implented yet`
+4. IRM-3638 IR reciever `! Function haven't implented yet`
+5. RP2040 Zero × 1
+   (Refer as RP2040 below)
+
+</details>
 
 ## Third Party Libraries
 
@@ -32,9 +59,21 @@ Big thank to the author(s) of these libraries
 
       This will increase the possibility of the setting being activated if nothing seem to go wrong.
 
-- HID-Project
+- [Arduino-Pico](https://github.com/earlephilhower/arduino-pico)
+  For developing RP2040-Zero with Arduino IDE and Arduino code.
+  Install the board:
+  1. `Arduino IDE 2` > `Arduino IDE` > `Preference` > `Additional boards manager URLs:`
+   Add below in the end:
+   ```
+   https://github.com/earlephilhower/arduino-pico/releases/download/global/package_rp2040_index.json
+   ```
+  2. `Arduino IDE 2` > `Boards Manager`
+  Search "RP2040", install "Raspberry Pi Pico/RP2040/RP2350" by "Earle F. Phithower, III".
+  - Adafruit TinyUSB library is going to install along installing this board.
+  The library for USB communication with the computer in [CY8C_code/NKRO_TinyUSB.h](./Codes/forCY8C/CY8C_code/NKRO_TinyUSB.h).
+  ***HOWEVER***, before flashing [CY8C_code.ino](./Codes/forCY8C/CY8C_code/CY8C_code.ino), please go to `Arduino IDE 2` > `Tools` > `USB Stack` > `Adafruit Tiny USB` to switch USB function.
 
-## Sensing method idea and PCB and dimensions ref (Japanese)
+## Sensing Concepts, PCB Design, and Dimensional References (Japanese)
 
 [Full dimensions and informations](https://mizucoffee.blogspot.com/2018/05/1-chunithm.html) (Blog, multiple pages)  
 [Detailed dimensions and sensing method](https://gist.github.com/mizucoffee/2f6263656d174fb2284a9e49c44bfabc)  
@@ -46,22 +85,22 @@ Big thank to the author(s) of these libraries
 
 ### Software Prerequisite
 
-- Arduino IDE (Tested v.2.3.8)
+- Arduino IDE (Tested v.2.3.8 on Windows 11 & macOS Tahoe)
   Have the third party library mentioned above installed (either install via .zip or install in the Library Manager in Arduino IDE and make sure you're installing "CypressCY8CMBR3116 by sebastianregelmann".)
 
 ### Step
 
-1. Wire your CY8CMBR3116 well on breadboard. I²C SDA → Pin D2, I²C SCL → Pin D3. Make sure you've pulled these pins up with 4.7kΩ resistor.
-2. Connect your Arduino to PC via USB cable.
+1. Wire your CY8CMBR3116 well on breadboard. I²C SDA → Pin 0, I²C SCL → Pin 1. Make sure you've pulled these pins up with 4.7kΩ resistor.
+2. Connect your RP2040 to PC via USB cable.
 3. Upload [ConfigCode.ino](./CY8C_code/ConfigCode/ConfigCode.ino)
 4. Upload [CY8C_code.ino](./CY8C_code/CY8C_code/CY8C_code.ino)
 5. Open serial monitor and tap the touch pad.
 
 ### Enabling Keyboard Input
 
-Connect Pin 6 on your Arduino to enable keyboard input.
+Connect Pin 8 on your RP2040 to enable keyboard input.
 
-## Touchpad Making Step
+## Prototype Touchpad Making Step
 
 Prepare a wooden board, print the image below that need to ensure the thickness of black line in the image are 8mm, and paste the paper with white glue.
 
@@ -72,7 +111,7 @@ Choose one of the designs to test the result. The sticks in the middle are touch
 After you decided the pattern you want to test, cover the black area with 8mm width copper tape and solder wires to these to pins:
 
 - Touch buttons → CS0 ~ CS5 on CY8CMBR3116 via a 560Ω resistor. (CS0 ~ CS7 if you choose 8 buttons one)
-- Ground → GND on Arduino
+- Ground → GND on RP2040
 
 Beware that the space between touch pad and ground ring is the maximum distance between your finger and the touch pad that can be detected as touched.
 
@@ -82,7 +121,6 @@ Only Chinese version is available at the time.
 
 ### Config
 
-![Images/FlowChart/Config_Code.svg](Images/FlowChart/Config_Code.svg)
 
 ### Running code (`CY8C_code.ino`)
 
@@ -96,11 +134,11 @@ Only Chinese version is available at the time.
 - [X] Introduce `HID-Project.h`
 - [X] Test multiple buttons
 - [X] Test IR Code
-- [ ] Improve latency → Latency is now improved from around 70~75ms to around 40 ms. (Updated 2026 May 11, 1st update)
-- [ ] Finish IR Code
+- [x] Improve latency → Latency is now improved from around 70~75ms to around 40 ms. (Updated 2026 May 11, 1st update)
+- [x] Finish IR Code <!-- TODO: To be test -->
 - [X] Print and test PCB
 - [ ] Finalize PCB design
-      Integrating CY8CMBR3116 the IC itself to the PCB and include Arduino Pro Micro to the PCB itself.
+      Integrating CY8CMBR3116 the IC itself to the PCB and include RP2040 to the PCB itself.
       Find the solution of IR sensing connection to the motherboard.
 - [ ] Finalize the case
 - [ ] Refine the README and documents and Public the Repo
@@ -115,8 +153,10 @@ Only Chinese version is available at the time.
 
 This project incorporates AI-assisted development tools to optimize workflow and efficiency:
 
-* **Code Completion**: GitHub Copilot and Continue (VS Code) were used for real-time autocompletion.
+* **Code Completion**: GitHub Copilot and Continue + `granite4:7b-a1b-h` (VS Code) were used for real-time autocompletion.
 * **Architectural Scaffolding**: Leveraged `phi4:14b` and `phi4-reasoning:14b` for generating initial boilerplate code and verifying logic in remote environments where hardware access was limited.
-* **Information Verification**: Google Gemini was utilized for conceptual research and documentation verification (no project source code was uploaded to this service).
+* **Information Verification**:
+  * Google Gemini was utilized for conceptual research and documentation verification (no project source code was uploaded to Gemini platform)
+  * Gemini models on Google AI Studio is used, with paid API key used to ensure legal data privacy.
 
 All AI-generated code has been manually reviewed, refactored, and tested to ensure logic integrity and project-specific requirements.

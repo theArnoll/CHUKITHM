@@ -1,5 +1,25 @@
 # A touch controller based on a Japanese Arcade
 
+English version | [繁體中文版本 (Traditional Chinese version)](README_zh-TW.md)
+
+## Table of Contents
+
+- [A touch controller based on a Japanese Arcade](#a-touch-controller-based-on-a-japanese-arcade)
+  - [Table of Contents](#table-of-contents)
+  - [BOM](#bom)
+  - [Third Party Libraries](#third-party-libraries)
+  - [Sensing Concepts, PCB Design, and Dimensional References (Japanese)](#sensing-concepts-pcb-design-and-dimensional-references-japanese)
+  - [Usage](#usage)
+    - [Software Prerequisite](#software-prerequisite)
+    - [Step](#step)
+    - [Enabling Keyboard Input](#enabling-keyboard-input)
+  - [Prototype Touchpad Making Step](#prototype-touchpad-making-step)
+  - [Program flow chart](#program-flow-chart)
+    - [Config](#config)
+    - [Running code (`CY8C_code.ino`)](#running-code-cy8c_codeino)
+  - [Development stage](#development-stage)
+  - [AI Usage \& Attribution](#ai-usage--attribution)
+
 ## BOM
 
 <details>
@@ -13,9 +33,7 @@
    3. 1uF × 1
    4. 2.2nF X7R × 1
    5. 4.7kΩ × 2
-1. Capacitive touch pad × 1 set (for now)
-   1. Double side conductive copper tape (making how-to look below)
-   2. 560Ω × 6 / set
+   6. 560Ω × 16
 2. IR LED `! Function haven't implented yet`
 3. IRM-3638 IR reciever `! Function haven't implented yet`
 4. RP2040 Zero × 1
@@ -60,7 +78,7 @@ Big thank to the author(s) of these libraries
       This will increase the possibility of the setting being activated if nothing seem to go wrong.
 
 - [Arduino-Pico](https://github.com/earlephilhower/arduino-pico)
-  For developing RP2040-Zero with Arduino IDE and Arduino code.
+  For developing RP2040-Zero with Arduino IDE and Arduino code.  
   Install the board:
   1. `Arduino IDE 2` > `Arduino IDE` > `Preference` > `Additional boards manager URLs:`
    Add below in the end:
@@ -69,8 +87,8 @@ Big thank to the author(s) of these libraries
    ```
   2. `Arduino IDE 2` > `Boards Manager`
   Search "RP2040", install "Raspberry Pi Pico/RP2040/RP2350" by "Earle F. Phithower, III".
-  - Adafruit TinyUSB library is going to install along installing this board.
-  The library for USB communication with the computer in [CY8C_code/NKRO_TinyUSB.h](./Codes/forCY8C/CY8C_code/NKRO_TinyUSB.h).
+  - Adafruit TinyUSB library is going to install along installing this board.  
+  The library for USB communication with the computer in [CY8C_code/NKRO_TinyUSB.h](./Codes/forCY8C/CY8C_code/NKRO_TinyUSB.h).  
   ***HOWEVER***, before flashing [CY8C_code.ino](./Codes/forCY8C/CY8C_code/CY8C_code.ino), please go to `Arduino IDE 2` > `Tools` > `USB Stack` > `Adafruit Tiny USB` to switch USB function.
 
 ## Sensing Concepts, PCB Design, and Dimensional References (Japanese)
@@ -91,14 +109,14 @@ Big thank to the author(s) of these libraries
 ### Step
 
 1. Wire your CY8CMBR3116 well on breadboard. I²C SDA → Pin 0, I²C SCL → Pin 1. Make sure you've pulled these pins up with 4.7kΩ resistor.
-2. Connect your RP2040 to PC via USB cable.
+2. Connect your RP2040 to your computer with a USB cable.
 3. Upload [ConfigCode.ino](./CY8C_code/ConfigCode/ConfigCode.ino)
 4. Upload [CY8C_code.ino](./CY8C_code/CY8C_code/CY8C_code.ino)
 5. Open serial monitor and tap the touch pad.
 
 ### Enabling Keyboard Input
 
-Connect Pin 8 on your RP2040 to enable keyboard input.
+Ground Pin 8 on your RP2040 to enable keyboard input.
 
 ## Prototype Touchpad Making Step
 
@@ -106,7 +124,7 @@ Prepare a wooden board, print the image below that need to ensure the thickness 
 
 ![./Images/MultipleButtonTest/MultipleButtonTest.png](./Images/MultipleButtonTest/MultipleButtonTest.png)
 
-Choose one of the designs to test the result. The sticks in the middle are touch buttons, and the outter ring is ground. The 6 touch buttons is good for playing rhythm games on PC.
+Choose one of the designs to test the result. The sticks in the middle are touch buttons, and the outter ring is ground. The 6 touch buttons one is good for playing rhythm games on PC.
 
 After you decided the pattern you want to test, cover the black area with 8mm width copper tape and solder wires to these to pins:
 
@@ -121,6 +139,7 @@ Only Chinese version is available at the time.
 
 ### Config
 
+![Images/FlowChart/Config_Code.svg](Images/FlowChart/Config_Code.svg)
 
 ### Running code (`CY8C_code.ino`)
 
@@ -134,8 +153,8 @@ Only Chinese version is available at the time.
 - [X] Introduce `HID-Project.h`
 - [X] Test multiple buttons
 - [X] Test IR Code
-- [x] Improve latency → Latency is now improved from around 70~75ms to around 40 ms. (Updated 2026 May 11, 1st update)
-- [x] Finish IR Code <!-- TODO: To be test -->
+- [X] Improve latency → Latency is now improved from around 70~75ms to around 40 ms. (Updated 2026 May 11, 1st update)
+- [X] Finish IR Code <!-- TODO: To be test -->
 - [X] Print and test PCB
 - [ ] Finalize PCB design
       Integrating CY8CMBR3116 the IC itself to the PCB and include RP2040 to the PCB itself.
@@ -144,7 +163,7 @@ Only Chinese version is available at the time.
 - [ ] Refine the README and documents and Public the Repo
    - [ ] Upload photos and closesource pictures to Imgur
    - [ ] Document the usage of CY8CMBR3116 in the same or another repo
-   - [ ] Public the repo
+   - [X] Public the repo
    - [ ] Refine the final README
 
 ---

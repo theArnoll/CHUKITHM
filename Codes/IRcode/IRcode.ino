@@ -1,10 +1,10 @@
-#define IR_TX_PIN 4  // 紅外線發射 (記得串聯 220 歐姆左右的限流電阻)
-#define IR_RX_PIN 5  // 38kHz 接收 IC 的 OUT 腳
+#define IR_TX_PIN 4  // IR emission (+220Ω resistor)
+#define IR_RX_PIN 5  // The OUT pin of IRM-3638
 
 void setup() {
 	// pinMode(IR_RX_PIN, INPUT);
 	for (uint8_t re = 8; re <= 13; re++)
-		pinMode(re, INPUT)
+		pinMode(re, INPUT);
 	Serial.begin(115200);
 }
 

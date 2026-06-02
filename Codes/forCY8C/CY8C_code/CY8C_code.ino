@@ -7,6 +7,12 @@
 
 CY8CMBR3116 touchIC(I2C_ADDRESS, REQUEST_TIMEOUT);
 
+void sendSPI(uint8_t latchPin, uint8_t dataPin, uint8_t data) {
+    digitalWrite(latchPin, LOW);
+    shiftOut(dataPin, clockPin, MSBFIRST, data);
+    digitalWrite(latchPin, HIGH);
+}
+
 void setup() {
     Serial.begin(115200);
     

@@ -107,7 +107,7 @@
 將 RP2040 的 Pin 8 接地以啟用鍵盤輸入功能。
 
 ## 原型觸控板製作步驟
-準備一塊木板，印出下方影像（確保黑線寬度在 8mm），並使用白色粘合劑貼上紙張。
+準備一塊木板，印出下方影像（確保黑線寬度為 8mm），並使用白膠貼合紙張。
 ![./Images/MultipleButtonTest/MultipleButtonTest.png](./Images/MultipleButtonTest/MultipleButtonTest.png)
 選擇一種設計來測試結果。中間的棒狀是觸控按鈕，外圍的環形為接地。6 個觸控按鈕的版本適合用於 PC 上的節奏類遊戲。
 決定你想測試的模式後，將黑色區域覆蓋上寬度為 8mm 的雙面導電銅箔帶並在以下引腳進行焊接：

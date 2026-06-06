@@ -1,8 +1,8 @@
 /PCB/TestPCB/TestPCB-backups
-/PCB/TestPCB/PCB/Mother/A/Gerber
-/PCB/TestPCB/PCB/Mother/B/Gerber
-/PCB/TestPCB/PCB/Child/A/Gerber
-/PCB/TestPCB/PCB/Child/B/Gerber
+Gerber/
 .DS_Store
 PCB/CY8CMBR3116_PCB (2).zip
 PCB/CY8CMBR3116_PCB.zip
+/.vscode
+*-backups/
+*.note.txt

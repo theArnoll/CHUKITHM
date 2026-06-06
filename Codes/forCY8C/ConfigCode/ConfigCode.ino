@@ -5,7 +5,7 @@
 //  / Official Configure Example but Modified /
 // -------------------------------------------
 
-#define I2C_ADDRESS 0x51     //I2C Address of the Cypress IC (0x37 is default)
+#define I2C_ADDRESS 0x37     //I2C Address of the Cypress IC (0x37 is default)
 #define REQUEST_TIMEOUT 40   //After how many request is a Timeout triggered
 #define NEW_I2C_ADDRESS 0x51 //I2C Address after programm. IC needs to be reseted for changes to apply
 #define LED_BUILTIN 10

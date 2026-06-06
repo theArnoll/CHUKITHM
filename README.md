@@ -143,8 +143,9 @@ Only Chinese version is available at the time.
 
 ### Running code (`CY8C_code.ino`)
 
-![Images/FlowChart/CY8C_Code_setup.svg](Images/FlowChart/CY8C_Code_setup.svg)
-![Images/FlowChart/CY8C_Code_loop.svg](Images/FlowChart/CY8C_Code_loop.svg)
+![Images/FlowChart/CY8C_code.svg](Images/FlowChart/CY8C_code.svg)
+<!-- ![Images/FlowChart/CY8C_Code_setup.svg](Images/FlowChart/CY8C_Code_setup.svg)
+![Images/FlowChart/CY8C_Code_loop.svg](Images/FlowChart/CY8C_Code_loop.svg) -->
 
 ## Development stage
 

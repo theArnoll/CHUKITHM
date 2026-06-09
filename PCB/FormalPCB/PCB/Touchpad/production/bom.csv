@@ -1,8 +1,8 @@
 ﻿Designator,Footprint,Quantity,Value,LCSC Part #
-C.1Μ_2,0603,1,C_0603_1608Metric_Pad1.08x0.95mm_HandSolder,C1525
-"C.1Μ, C2.2NF",0603,2,C_0603_1608Metric_Pad1.08x0.95mm_HandSolder,C15849
-C1Μ,0603,1,C_0603_1608Metric_Pad1.08x0.95mm_HandSolder,C52923
+"C.1Μ_2, C.1Μ",0402,2,C_0402_1005Metric_Pad0.74x0.62mm_HandSolder,C1525
+C1Μ,0402,1,C_0402_1005Metric_Pad0.74x0.62mm_HandSolder,C52923
+C2.2NF,0603,1,C_0603_1608Metric_Pad1.08x0.95mm_HandSolder,C15849
 CY8CMBR3116,QFN-24-1EP_4x4mm_P0.5mm_EP2.65x2.65mm_ThermalVias,1,(footprint {dblquote}Package_DFN_QFN:QFN-24-1EP_4x4mm_P0.5mm_EP2.6x2.6mm{dblquote},C914913
-"R4.7K_2, R4.7K",0603,2,R_0603_1608Metric_Pad0.98x0.95mm_HandSolder,C25900
+R220,0603,1,R_0603_1608Metric_Pad0.98x0.95mm_HandSolder,C22962
+"R4.7K_2, R4.7K",0402,2,C_0402_1005Metric_Pad0.74x0.62mm_HandSolder,C25900
 "R560_16, R560_15, R560_14, R560_13, R560_12, R560_11, R560_10, R560_9, R560_8, R560_7, R560_6, R560_5, R560_4, R560_3, R560_2, R560",0603,16,R_0603_1608Metric_Pad0.98x0.95mm_HandSolder,C23204
-U?,RP2040_Zero,1,RP2040_Zero,

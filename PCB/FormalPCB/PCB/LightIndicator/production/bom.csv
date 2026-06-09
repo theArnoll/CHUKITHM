@@ -1,5 +1,0 @@
-﻿Designator,Footprint,Quantity,Value,LCSC Part #
-"1KΩ_22, 1KΩ_21, 1KΩ_20, 1KΩ_19, 1KΩ_18, 1KΩ_17, 1KΩ_16, 1KΩ_15, 1KΩ_14, 1KΩ_13, 1KΩ_12, 1KΩ_11, 1KΩ_10, 1KΩ_9, 1KΩ_8, 1KΩ_7, 1KΩ_6, 1KΩ_5, 1KΩ_4, 1KΩ_3, 1KΩ_2, 1KΩ",0402,22,R_0402_1005Metric,C11702
-"74HC595_3, 74HC595_2, 74HC595",SOIC-16_3.9x9.9mm_P1.27mm,3,SOIC-16_3.9x9.9mm_P1.27mm,C5947
-"BARGRAPH10+_2, BARGRAPH10+, BARGRAPH10-_2, BARGRAPH10-",PinHeader_1x10_P2.54mm_Vertical,4,PinHeader_1x10_P2.54mm_Vertical,
-"C.1Μ_3, C.1Μ_2, C.1Μ",0603,3,C_0603_1608Metric_Pad1.08x0.95mm_HandSolder,C1525

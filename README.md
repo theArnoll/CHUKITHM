@@ -28,15 +28,15 @@ English version | [繁體中文版本 (Traditional Chinese version)](README_zh-T
 
 1. Testing PCB [motherboard type B](./PCB/TestPCB/TestMotherboardB.kicad_pcb) × 1
 1. Testing PCB [childboard type B](./PCB/TestPCB/TestChildboardB.kicad_pcb) × 1
-   1. CY8CMBR3116 w/ [DIP convertion board](./PCB/CY8CMBR3116_PCB/CY8CMBR3116_PCB.kicad_pro) × 1 `! The KiCad prject is created with KiCad version 9 or 8.`
+   1. CY8CMBR3116 w/ [DIP convertion board](./PCB/CY8CMBR3116_PCB/CY8CMBR3116_PCB.kicad_pro) × 1 `! The KiCad project is created with KiCad version 9 or 8.`
    2. 0.1uF × 2
    3. 1uF × 1
    4. 2.2nF X7R × 1
    5. 4.7kΩ × 2
    6. 560Ω × 16
 2. IR LED `! Function haven't implented yet`
-3. IRM-3638 IR reciever `! Function haven't implented yet`
-4. RP2040 Zero × 1
+3. ~IRM-3638~ TSSP58038 IR reciever `! Function haven't implented yet, likely to switch to TSSP58038`
+4. RP2040-Zero × 1
    (Refer as RP2040 below)
 
 </details>
@@ -54,8 +54,8 @@ English version | [繁體中文版本 (Traditional Chinese version)](README_zh-T
    1. Double side conductive copper tape (making how-to look below)
    2. 560Ω × 6/set or 8/set according to [which you choose](#prototype-touchpad-making-step)
 3. IR LED `! Function haven't implented yet`
-4. IRM-3638 IR reciever `! Function haven't implented yet`
-5. RP2040 Zero × 1
+4. ~IRM-3638~ TSSP58038 IR reciever `! Function haven't implented yet, likely to switch to TSSP58038`
+5. RP2040-Zero × 1
    (Refer as RP2040 below)
 
 </details>
@@ -157,12 +157,12 @@ Only Chinese version is available at the time.
 - [X] Improve latency → Latency is now improved from around 70~75ms to around 40 ms. (Updated 2026 May 11, 1st update)
 - [X] Finish IR Code <!-- TODO: To be test -->
 - [X] Print and test PCB
-- [ ] Finalize PCB design
+- [X] Finalize PCB design
       Integrating CY8CMBR3116 the IC itself to the PCB and include RP2040 to the PCB itself.
       Find the solution of IR sensing connection to the motherboard.
 - [ ] Finalize the case
 - [ ] Refine the README and documents and Public the Repo
-   - [ ] Upload photos and closesource pictures to Imgur
+   - [ ] Upload photos and close source pictures to Imgur
    - [ ] Document the usage of CY8CMBR3116 in the same or another repo
    - [X] Public the repo
    - [ ] Refine the final README
@@ -177,6 +177,6 @@ This project incorporates AI-assisted development tools to optimize workflow and
 * **Architectural Scaffolding**: Leveraged `phi4:14b` and `phi4-reasoning:14b` for generating initial boilerplate code and verifying logic in remote environments where hardware access was limited.
 * **Information Verification**:
   * Google Gemini was utilized for conceptual research and documentation verification (no project source code was uploaded to Gemini platform)
-  * Gemini models on Google AI Studio is used, with paid API key used to ensure legal data privacy.
+  * Gemini models and Gemma 4 models on Google AI Studio is used, with paid API key used to ensure legal data privacy.
 
 All AI-generated code has been manually reviewed, refactored, and tested to ensure logic integrity and project-specific requirements.

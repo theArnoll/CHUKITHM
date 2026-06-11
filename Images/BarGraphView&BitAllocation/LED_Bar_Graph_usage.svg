@@ -298,9 +298,6 @@
                 </g>
                 <text x="17.182px" y="22.364px" style="font-family:'RobotoSlab-Regular', 'Roboto Slab';font-size:21.617px;fill:white;">T<tspan x="30.861px " y="22.364px ">o</tspan>uch stat<tspan x="124.315px " y="22.364px ">e</tspan> 8..15</text>
             </g>
-            <g transform="matrix(0.183196,0,0,1.078896,120.061065,0)">
-                <rect x="0" y="0" width="6.627" height="29.543" style="fill:rgb(158,255,239);"/>
-            </g>
             <g transform="matrix(0.183196,0,0,1.078896,117.941872,0.44073)">
                 <g transform="matrix(21.616569,0,0,21.616569,183.527866,22.363846)">
                 </g>
@@ -327,9 +324,10 @@
                 <text x="17.182px" y="22.364px" style="font-family:'RobotoSlab-Regular', 'Roboto Slab';font-size:21.617px;fill:rgb(136,136,136);">Rsr<tspan x="51.791px " y="22.364px ">v</tspan></text>
             </g>
             <g transform="matrix(0.183196,0,0,1.078896,297.896073,0.907626)">
-                <g transform="matrix(21.616569,0,0,21.616569,164.444488,22.363846)">
+                <text x="17.182px" y="22.364px" style="font-family:'RobotoSlab-Regular', 'Roboto Slab';font-size:21.617px;fill:rgb(136,136,136);">Rsr<tspan x="51.791px " y="22.364px ">v</tspan></text>
+                <g transform="matrix(16.186898,0,0,16.186898,141.825217,22.363846)">
                 </g>
-                <text x="17.182px" y="22.364px" style="font-family:'RobotoSlab-Regular', 'Roboto Slab';font-size:21.617px;fill:rgb(136,136,136);">Rsr<tspan x="51.791px " y="22.364px ">v</tspan> (Reser<tspan x="133.898px 146.364px " y="22.364px 22.364px ">ve</tspan>)</text>
+                <text x="69.893px" y="22.364px" style="font-family:'RobotoSlab-Medium', 'Roboto Slab';font-weight:500;font-size:16.187px;fill:rgb(136,136,136);">(Reser<tspan x="118.383px 127.93px " y="22.364px 22.364px ">ve</tspan>)</text>
             </g>
             <g transform="matrix(0.183196,0,0,1.078896,327.603014,0.770974)">
                 <g transform="matrix(21.616569,0,0,21.616569,90.4964,22.363846)">

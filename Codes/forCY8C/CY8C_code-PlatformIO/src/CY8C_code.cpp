@@ -10,6 +10,38 @@
 CY8CMBR3116 touchIC(I2C_ADDRESS, REQUEST_TIMEOUT);
 Adafruit_NeoPixel pixels(1, 16, NEO_GRB + NEO_KHZ800);
 
+void printError(uint8_t errorCode)
+{
+    Serial.print("Communication Error ");
+    switch (errorCode)
+    {
+        case 1: Serial.println("1: Data too long to fit in transmit buffer");
+                pixels.setPixelColor(0, pixels.Color(255, 0, 0)); pixels.show(); break; // red
+        case 2: Serial.println("2: Received NACK on transmit of address"); 
+                pixels.setPixelColor(0, pixels.Color(0, 255, 0)); pixels.show(); break; // green
+        case 3: Serial.println("3: Received NACK on transmit of data"); 
+                pixels.setPixelColor(0, pixels.Color(0, 0, 255)); pixels.show(); break;  // blue
+        case 4: Serial.println("4: Other Error");
+                pixels.setPixelColor(0, pixels.Color(255, 255, 0)); pixels.show(); break; // yellow
+        case 5: Serial.println("5: Timeout Error"); 
+                pixels.setPixelColor(0, pixels.Color(255, 0, 255)); pixels.show(); break; // purple
+        default:
+            Serial.print("Unknown: Unknown Wire Error ");
+            Serial.println(errorCode);
+            pixels.setPixelColor(0, pixels.Color(255, 255, 255)); pixels.show();
+            break;
+    }
+}
+
+void requestTouchStatus(uint8_t statusStorage[2][2])
+{
+    uint8_t touchStatusBuffer[2];
+    uint8_t error = touchIC.get_BUTTON_STAT(touchStatusBuffer);
+    if (error != 0) { Serial.print("Request Touch Status Loop: "); printError(error); }
+                else { pixels.clear(); pixels.show(); }
+    statusStorage[0][0] = touchStatusBuffer[0]; statusStorage[0][1] = touchStatusBuffer[1];
+}
+
 void sendSPI(uint32_t data, uint8_t latchPin, uint8_t dataLength) {
     SPI1.beginTransaction(SPISettings(1000000, MSBFIRST, SPI_MODE0));
     digitalWrite(latchPin, LOW);
@@ -129,37 +161,4 @@ void loop() {
     lastStatus[0][0] = touchStatus[0][0]; lastStatus[0][1] = touchStatus[0][1];
 	Serial.print(micros() - lastmicroS);
 	lastmicroS = micros();
-}
-
-void requestTouchStatus(uint8_t statusStorage[2][2])
-{
-    uint8_t touchStatusBuffer[2];
-    uint8_t error = touchIC.get_BUTTON_STAT(touchStatusBuffer);
-    if (error != 0) { Serial.print("Request Touch Status Loop: "); printError(error); }
-                else { pixels.clear(); pixels.show(); }
-    statusStorage[0][0] = touchStatusBuffer[0]; statusStorage[0][1] = touchStatusBuffer[1];
-}
-
-// 打印錯誤訊息
-void printError(uint8_t errorCode)
-{
-    Serial.print("Communication Error ");
-    switch (errorCode)
-    {
-        case 1: Serial.println("1: Data too long to fit in transmit buffer");
-                pixels.setPixelColor(0, pixels.Color(255, 0, 0)); pixels.show(); break; // red
-        case 2: Serial.println("2: Received NACK on transmit of address"); 
-                pixels.setPixelColor(0, pixels.Color(0, 255, 0)); pixels.show(); break; // green
-        case 3: Serial.println("3: Received NACK on transmit of data"); 
-                pixels.setPixelColor(0, pixels.Color(0, 0, 255)); pixels.show(); break;  // blue
-        case 4: Serial.println("4: Other Error");
-                pixels.setPixelColor(0, pixels.Color(255, 255, 0)); pixels.show(); break; // yellow
-        case 5: Serial.println("5: Timeout Error"); 
-                pixels.setPixelColor(0, pixels.Color(255, 0, 255)); pixels.show(); break; // purple
-        default:
-            Serial.print("Unknown: Unknown Wire Error ");
-            Serial.println(errorCode);
-            pixels.setPixelColor(0, pixels.Color(255, 255, 255)); pixels.show();
-            break;
-    }
 }

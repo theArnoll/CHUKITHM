@@ -1,8 +1,0 @@
-Comment,Designator,Footprint,LCSC,Quantity
-(footprint {dblquote}Package_DFN_QFN:QFN-24-1EP_4x4mm_P0.5mm_EP2.6x2.6mm{dblquote},CY8CMBR3116,QFN-24-1EP_4x4mm_P0.5mm_EP2.65x2.65mm_ThermalVias,C914913,1
-C_0603_1608Metric_Pad1.08x0.95mm_HandSolder,C.1μ,C_0603_1608Metric_Pad1.08x0.95mm_HandSolder,C1525,1
-C_0603_1608Metric_Pad1.08x0.95mm_HandSolder,C2.2nF,C_0603_1608Metric_Pad1.08x0.95mm_HandSolder,C15849,1
-C_0603_1608Metric_Pad1.08x0.95mm_HandSolder,C1μ,C_0603_1608Metric_Pad1.08x0.95mm_HandSolder,C52923,1
-R_0603_1608Metric_Pad0.98x0.95mm_HandSolder,R220,R_0603_1608Metric_Pad0.98x0.95mm_HandSolder,C22962,1
-R_0603_1608Metric_Pad0.98x0.95mm_HandSolder,R560,R_0603_1608Metric_Pad0.98x0.95mm_HandSolder,C23204,1
-R_0603_1608Metric_Pad0.98x0.95mm_HandSolder,R4.7k,R_0603_1608Metric_Pad0.98x0.95mm_HandSolder,C25900,1

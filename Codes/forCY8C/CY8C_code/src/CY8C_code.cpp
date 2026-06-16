@@ -8,6 +8,7 @@
 #define REQUEST_TIMEOUT 40   //After how many request is a Timeout triggered
 
 CY8CMBR3116 touchIC(I2C_ADDRESS, REQUEST_TIMEOUT);
+CY8CMBR3116 touchIC2(I2C_ADDRESS + 1, REQUEST_TIMEOUT);
 Adafruit_NeoPixel pixels(1, 16, NEO_GRB + NEO_KHZ800);
 
 void printError(uint8_t errorCode)
@@ -35,11 +36,21 @@ void printError(uint8_t errorCode)
 
 void requestTouchStatus(uint8_t statusStorage[2][2])
 {
-    uint8_t touchStatusBuffer[2];
-    uint8_t error = touchIC.get_BUTTON_STAT(touchStatusBuffer);
-    if (error != 0) { Serial.print("Request Touch Status Loop: "); printError(error); }
+    uint8_t touchStatusBuffer[0][2];
+
+    uint8_t error = touchIC.get_BUTTON_STAT(touchStatusBuffer[0]);
+    if (error != 0) { Serial.print("IC1 Request Touch Status Loop: "); printError(error); }
                 else { pixels.clear(); pixels.show(); }
-    statusStorage[0][0] = touchStatusBuffer[0]; statusStorage[0][1] = touchStatusBuffer[1];
+
+    error = touchIC2.get_BUTTON_STAT(touchStatusBuffer[1]);
+    if (error != 0) { Serial.print("IC2 Request Touch Status Loop: "); printError(error); }
+                else { pixels.clear(); pixels.show(); }
+
+    for (uint8_t a = 0; a <= 1; a++)
+    {
+        for (uint8_t b = 0; b <= 1; b++)
+            statusStorage[a][b] = touchStatusBuffer[a][b];
+    }
 }
 
 void sendSPI(uint32_t data, uint8_t latchPin, uint8_t dataLength) {
@@ -75,13 +86,13 @@ void setup() {
     Wire.begin();   
     Wire.setClock(400000);  // 400kHz I²C fast mode
 
-    pinMode(7, INPUT_PULLUP);
-    pinMode(8, INPUT_PULLUP);
+    pinMode(15, INPUT_PULLUP); //7
+    pinMode(14, INPUT_PULLUP); //8
     
-    if (digitalRead(7))
+    if (digitalReadFast(15))
     {
         uint16_t sysTime = micros();
-        while (!Serial && micros() - sysTime < 2000000) { ; }  // wait for serial port to connect. timeout 2s
+        while (!Serial && millis() - sysTime < 2000) { ; }  // wait for serial port to connect. timeout 2s
         if (micros() - sysTime > 2000000)  // if the reason run through here is not serial connection
         {
             pixels.setPixelColor(0, pixels.Color(0, 255, 255)); pixels.show();
@@ -98,7 +109,7 @@ void setup() {
     SPI1.begin();
     pinMode(12, OUTPUT);
 
-    if(!digitalRead(8)) KB.begin();
+    if(!digitalReadFast(14)) KB.begin();
 
     for (int i = 0; i <= 16; i++) {
         uint16_t marqueeData = (1 << i);
@@ -122,43 +133,52 @@ void loop() {
     uint8_t touchStatus[2][2];
     requestTouchStatus(touchStatus);
 
-    if(digitalRead(7) == LOW)
+    for (uint8_t ICsel = 0; ICsel <= 1; ICsel++)
     {
-        Serial.print("|");
-        for (uint8_t re = 0; re < 2; re++)
-        {   for (int pointer = 0; pointer < 8; pointer++)
-            {
-                uint8_t pressed = touchStatus[0][re] >> pointer & 0b00000001;
-                Serial.print((char)(pressed ? (pointer+'0') : '-'));
-                Serial.print("|");
+        if(digitalReadFast(15) == LOW)
+        {
+            Serial.print(ICsel + 1); Serial.print(": |");
+            for (uint8_t re = 0; re < 2; re++)
+            {   for (int pointer = 0; pointer < 8; pointer++)
+                {
+                    uint8_t pressed = touchStatus[ICsel][re] >> pointer & 0b00000001;
+                    Serial.print((char)(pressed ? (pointer+'0') : '-'));
+                    Serial.print("|");
+                }
+                if (!re) Serial.print(" |"); else Serial.println();
             }
-            if (!re) Serial.print(" |"); else Serial.println();
         }
     }
     
-    if (digitalRead(8) == LOW && (lastStatus[0][0] != touchStatus[0][0] || lastStatus[0][1] != touchStatus[0][1]))
-    {   for (uint8_t bfrsel = 0; bfrsel <= 1; bfrsel++)
-        {   for (int pointer = 0; pointer < 8; pointer++)
-            {   uint8_t pressed = touchStatus[0][bfrsel] >> pointer & 0b00000001,
-                    lastPressed = lastStatus[0][bfrsel]  >> pointer & 0b00000001;
-                if(pressed && (pressed != lastPressed))
-                {
-                    KB.add(keymap[0][bfrsel][pointer]);
-                    if(!digitalRead(7)) Serial.println(keymap[0][bfrsel][pointer]);
-                }
-                else {
-                    if(pressed != lastPressed)
+    for (uint8_t ICsel = 0; ICsel <= 1; ICsel++)
+    {
+        if (digitalReadFast(14) == LOW && (lastStatus[ICsel][0] != touchStatus[ICsel][0] || lastStatus[ICsel][1] != touchStatus[ICsel][1]))
+        {   for (uint8_t bfrsel = 0; bfrsel <= 1; bfrsel++)
+            {   for (int pointer = 0; pointer < 8; pointer++)
+                {   uint8_t pressed = touchStatus[ICsel][bfrsel] >> pointer & 0b00000001,
+                        lastPressed = lastStatus[ICsel][bfrsel]  >> pointer & 0b00000001;
+                    if(pressed && (pressed != lastPressed))
                     {
-                        KB.release(keymap[0][bfrsel][pointer]);
-                        if(!digitalRead(7)) { Serial.print("-"); Serial.println(keymap[0][bfrsel][pointer]); }
+                        KB.add(keymap[ICsel][bfrsel][pointer]);
+                        if(!digitalReadFast(15)) Serial.println(keymap[ICsel][bfrsel][pointer]);
                     }
-                }
-            }  // end for in byte
-        }  // end for in buffer
-    }  // end if
+                    else {
+                        if(pressed != lastPressed)
+                        {
+                            KB.release(keymap[ICsel][bfrsel][pointer]);
+                            if(!digitalReadFast(15)) { Serial.print("-"); Serial.println(keymap[ICsel][bfrsel][pointer]); }
+                        }
+                    }
+                }  // end for in byte
+            }  // end for in buffer
+        }  // end if
+    } // end for
 
     KB.send();
     lastStatus[0][0] = touchStatus[0][0]; lastStatus[0][1] = touchStatus[0][1];
-	Serial.print(micros() - lastmicroS);
-	lastmicroS = micros();
+	if (!digitalReadFast(15))
+    {
+        Serial.println(micros() - lastmicroS);
+        lastmicroS = micros();
+    }
 }

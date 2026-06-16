@@ -1,0 +1,13 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "C/C++ Runner: Debug Session",
+      "type": "lldb",
+      "request": "launch",
+      "args": [],
+      "cwd": "/Users/arnoldlucario/Library/CloudStorage/GoogleDrive-s10054@ms2.kjes.kh.edu.tw/其他電腦/我的電腦/DevelopmentFiles/Hardware/Rhythm_Game_Touch_Controller/CHUKITHM_GitHub/Codes/forCY8C/CY8C_code-PlatformIO/src",
+      "program": "/Users/arnoldlucario/Library/CloudStorage/GoogleDrive-s10054@ms2.kjes.kh.edu.tw/其他電腦/我的電腦/DevelopmentFiles/Hardware/Rhythm_Game_Touch_Controller/CHUKITHM_GitHub/Codes/forCY8C/CY8C_code-PlatformIO/src/build/Debug/outDebug"
+    }
+  ]
+}

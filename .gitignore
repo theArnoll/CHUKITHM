@@ -5,5 +5,5 @@ PCB/CY8CMBR3116_PCB (2).zip
 PCB/CY8CMBR3116_PCB.zip
 /.vscode
 *-backups/
-*.note.txt
+*.note.*
 .history/

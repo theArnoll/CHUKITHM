@@ -7,6 +7,8 @@ English version | [繁體中文版本 (Traditional Chinese version)](README_zh-T
 - [A touch controller based on a Japanese Arcade](#a-touch-controller-based-on-a-japanese-arcade)
   - [Table of Contents](#table-of-contents)
   - [BOM](#bom)
+  - [Development platform](#development-platform)
+    - [This project is develop with PlatformIO + Arduino C++ code](#this-project-is-develop-with-platformio--arduino-c-code)
   - [Third Party Libraries](#third-party-libraries)
   - [Sensing Concepts, PCB Design, and Dimensional References (Japanese)](#sensing-concepts-pcb-design-and-dimensional-references-japanese)
   - [Usage](#usage)
@@ -59,6 +61,15 @@ English version | [繁體中文版本 (Traditional Chinese version)](README_zh-T
    (Refer as RP2040 below)
 
 </details>
+
+## Development platform
+
+### This project is develop with PlatformIO + Arduino C++ code
+
+<!-- TODO: explain it more -->
+
+1. VSCode -> Extensions, install PlatformIO
+2. Add project: each project folder in this Repo <!-- for ex: [Code/IRcode](Code/IRcode) -->
 
 ## Third Party Libraries
 

@@ -36,7 +36,8 @@ void printError(uint8_t errorCode)
 
 void requestTouchStatus(uint8_t statusStorage[2][2])
 {
-    uint8_t touchStatusBuffer[0][2];
+    // 【修正 1】大小必須是 [2][2]，原為 [0][2] 會造成嚴重記憶體越界當機
+    uint8_t touchStatusBuffer[2][2];
 
     uint8_t error = touchIC.get_BUTTON_STAT(touchStatusBuffer[0]);
     if (error != 0) { Serial.print("IC1 Request Touch Status Loop: "); printError(error); }
@@ -56,26 +57,49 @@ void requestTouchStatus(uint8_t statusStorage[2][2])
 void sendSPI(uint32_t data, uint8_t latchPin, uint8_t dataLength) {
     SPI1.beginTransaction(SPISettings(1000000, MSBFIRST, SPI_MODE0));
     digitalWrite(latchPin, LOW);
-    switch (dataLength) {  // 1~4 or 8, 16, 24, 
-        case 1: case 8:
-            SPI1.transfer(data & 0xFF);
-            break;
-        case 2: case 16:
-            SPI1.transfer16(data & 0xFFFF);
-            break;
-        case 3: case 24:
-            SPI1.transfer((data >> 16) & 0xFF);
-            SPI1.transfer16(data & 0xFFFF);
-            break;
-        case 4: case 32:
-            SPI1.transfer16((data >> 16) & 0xFFFF);
-            SPI1.transfer16(data & 0xFFFF);
-            break;
-        default: 
-            break;
+    switch (dataLength) {  
+        case 1: case 8: SPI1.transfer(data & 0xFF); break;
+        case 2: case 16: SPI1.transfer16(data & 0xFFFF); break;
+        case 3: case 24: SPI1.transfer((data >> 16) & 0xFF); SPI1.transfer16(data & 0xFFFF); break;
+        case 4: case 32: SPI1.transfer16((data >> 16) & 0xFFFF); SPI1.transfer16(data & 0xFFFF); break;
+        default: break;
     }
     digitalWrite(latchPin, HIGH);
     SPI1.endTransaction();
+}
+
+#define CATHODE_TOP_ON    (1UL << 23) 
+#define CATHODE_BOTTOM_ON (1UL << 22) 
+#define CATHODE_BOTH_ON   0UL         
+
+void runSingleDotMarquee(uint8_t delayTime) {
+    for (int i = 0; i < 20; i++) {
+        uint32_t marqueeData = (1UL << i); 
+        marqueeData |= CATHODE_TOP_ON;     
+        sendSPI(marqueeData, 12, 3);
+        delay(delayTime);
+    }
+    for (int i = 0; i < 20; i++) {
+        uint32_t marqueeData = (1UL << i); 
+        marqueeData |= CATHODE_BOTTOM_ON;  
+        sendSPI(marqueeData, 12, 3);
+        delay(delayTime);
+    }
+}
+
+void runDualBarGraph(uint8_t delayTime) {
+    for (int i = 0; i < 20; i++) {
+        uint32_t marqueeData = 0;
+        for (int j = 0; j <= i; j++) marqueeData |= (1UL << j);     
+        marqueeData |= CATHODE_BOTH_ON;    
+        sendSPI(marqueeData, 12, 3); delay(delayTime);
+    }
+    for (int i = 19; i >= 0; i--) {
+        uint32_t marqueeData = 0;
+        for (int j = 0; j < i; j++) marqueeData |= (1UL << j);
+        marqueeData |= CATHODE_BOTH_ON;
+        sendSPI(marqueeData, 12, 3); delay(delayTime);
+    }
 }
 
 void setup() {
@@ -84,19 +108,23 @@ void setup() {
     
     Wire.setSDA(0); Wire.setSCL(1);
     Wire.begin();   
-    Wire.setClock(400000);  // 400kHz I²C fast mode
+    Wire.setClock(400000);  
+
+    // 【修正 2】加上 50ms 延遲，給觸控 IC 喚醒時間
+    delay(50);
 
     pinMode(15, INPUT_PULLUP); //7
     pinMode(14, INPUT_PULLUP); //8
     
     if (digitalReadFast(15))
     {
-        uint16_t sysTime = micros();
-        while (!Serial && millis() - sysTime < 2000) { ; }  // wait for serial port to connect. timeout 2s
-        if (micros() - sysTime > 2000000)  // if the reason run through here is not serial connection
+        // 【修正 3】將 micros() 改為 millis() 搭配 uint32_t，並在 while 內加入 delay(1) 避免獨佔 CPU 導致 USB 卡死
+        uint32_t sysTime = millis();
+        while (!Serial && millis() - sysTime < 2000) { delay(1); }  
+        if (millis() - sysTime >= 2000)  
         {
             pixels.setPixelColor(0, pixels.Color(0, 255, 255)); pixels.show();
-            delay(200); // at least show for 200ms           // show onboard sky blue light
+            delay(200); 
         }
     }
     
@@ -109,22 +137,50 @@ void setup() {
     SPI1.begin();
     pinMode(12, OUTPUT);
 
-    if(!digitalReadFast(14)) KB.begin();
+    // 【修正 4】無條件初始化 KB.begin()，不再被 Pin 14 開關綁死，否則 USB 無法正確掛載鍵盤
+    KB.begin();
 
-    for (int i = 0; i <= 16; i++) {
-        uint16_t marqueeData = (1 << i);
-        sendSPI(marqueeData, 12, 2);
-        delay(100);
+    runSingleDotMarquee(100);
+    delay(500); 
+    runDualBarGraph(50);
+
+    Serial.println("--- 讀取晶片硬體自檢報告 ---");
+
+    Wire.beginTransmission(0x51); Wire.write(0x98); Wire.endTransmission(false); Wire.requestFrom(0x51, 2);
+    if (Wire.available() == 2) {
+        Serial.print("Cp > 45pF (CS0~CS7)  : "); Serial.println(Wire.read(), BIN);
+        Serial.print("Cp > 45pF (CS8~CS15) : "); Serial.println(Wire.read(), BIN);
     }
-
+    Wire.beginTransmission(0x51); Wire.write(0x9E); Wire.endTransmission(false); Wire.requestFrom(0x51, 2);
+    if (Wire.available() == 2) {
+        Serial.print("對感應器短路 (CS0~CS7)   : "); Serial.println(Wire.read(), BIN);
+        Serial.print("對感應器短路 (CS8~CS15)  : "); Serial.println(Wire.read(), BIN);
+    }
+    Wire.beginTransmission(0x51); Wire.write(0x9A); Wire.endTransmission(false); Wire.requestFrom(0x51, 2);
+    if (Wire.available() == 2) {
+        Serial.print("對高短路 (CS0~CS7)   : "); Serial.println(Wire.read(), BIN);
+        Serial.print("對高短路 (CS8~CS15)  : "); Serial.println(Wire.read(), BIN);
+    }
+    Wire.beginTransmission(0x51); Wire.write(0x9C); Wire.endTransmission(false); Wire.requestFrom(0x51, 2);
+    if (Wire.available() == 2) {
+        Serial.print("對地短路 (CS0~CS7)   : "); Serial.println(Wire.read(), BIN);
+        Serial.print("對地短路 (CS8~CS15)  : "); Serial.println(Wire.read(), BIN);
+    }
+    Wire.beginTransmission(0x51); Wire.write(0x97); Wire.endTransmission(false); Wire.requestFrom(0x51, 1);
+    if (Wire.available() == 1) {
+        Serial.print("晶片判定存活的按鍵總數: ");
+        Serial.println(Wire.read() & 0x1F); 
+    }
+    Serial.println("EOF");
+    digitalWrite(14, LOW);
     Serial.println("Start Program");
 }
 
 char keymap[2][2][8] = {  //   0    1    2    3    4    5    6    7
-                        {   { '0', '0', '0', '0', 'r', 'r', 'e', 'e' } , // IC 1
-                            { 'o', 'o', 'i', 'i', 'u', 'u', 't', 't' }   },
-                        {   { '0', '0', '0', '0', '0', '0', '0', '0' } , // IC 2
-                            { '0', '0', '0', '0', '0', '0', '0', '0' }   } };
+                        {   { '1', 'q', 'a', 'z', 'v', 'f', 'r', '4' } , // IC 1
+                            { 'c', 'd', 'e', '3', 'x', 's', 'w', '2' }   },
+                        {   { '5', 't', 'g', 'b', ',', 'k', 'i', '8' } , // IC 2
+                            { 'm', 'j', 'u', '7', 'n', 'h', 'y', '6' }   } };
 uint8_t lastStatus[2][2] = { { 0, 0 }, { 0, 0 } }; // 2 ICs
 
 unsigned long lastmicroS = micros();
@@ -133,8 +189,12 @@ void loop() {
     uint8_t touchStatus[2][2];
     requestTouchStatus(touchStatus);
 
+    // 【修正 5】增加 needToSend 標記，避免每秒瘋狂呼叫 KB.send() 塞爆 USB 導致卡死
+    bool needToSend = false;
+
     for (uint8_t ICsel = 0; ICsel <= 1; ICsel++)
-    {
+    {   
+        // 【修正 6】徹底刪除 digitalWrite(15, 0) 避免破壞腳位的 INPUT_PULLUP 狀態
         if(digitalReadFast(15) == LOW)
         {
             Serial.print(ICsel + 1); Serial.print(": |");
@@ -151,21 +211,25 @@ void loop() {
     }
     
     for (uint8_t ICsel = 0; ICsel <= 1; ICsel++)
-    {
+    {   
+        // 【修正 6】徹底刪除 digitalWrite(14, 0)
         if (digitalReadFast(14) == LOW && (lastStatus[ICsel][0] != touchStatus[ICsel][0] || lastStatus[ICsel][1] != touchStatus[ICsel][1]))
         {   for (uint8_t bfrsel = 0; bfrsel <= 1; bfrsel++)
             {   for (int pointer = 0; pointer < 8; pointer++)
                 {   uint8_t pressed = touchStatus[ICsel][bfrsel] >> pointer & 0b00000001,
                         lastPressed = lastStatus[ICsel][bfrsel]  >> pointer & 0b00000001;
+                    
                     if(pressed && (pressed != lastPressed))
                     {
                         KB.add(keymap[ICsel][bfrsel][pointer]);
+                        needToSend = true; // 標記需要發送
                         if(!digitalReadFast(15)) Serial.println(keymap[ICsel][bfrsel][pointer]);
                     }
                     else {
                         if(pressed != lastPressed)
                         {
                             KB.release(keymap[ICsel][bfrsel][pointer]);
+                            needToSend = true; // 標記需要發送
                             if(!digitalReadFast(15)) { Serial.print("-"); Serial.println(keymap[ICsel][bfrsel][pointer]); }
                         }
                     }
@@ -174,8 +238,17 @@ void loop() {
         }  // end if
     } // end for
 
-    KB.send();
-    lastStatus[0][0] = touchStatus[0][0]; lastStatus[0][1] = touchStatus[0][1];
+    // 【修正 5 續】只有真的發生按鍵變化時，才把訊號推給 USB
+    if (needToSend) {
+        KB.send();
+    }
+
+    // 【修正 7】正確使用迴圈更新所有 IC 的上次狀態，原版漏了第二顆 IC 會導致卡鍵或邏輯錯誤
+    for(uint8_t i = 0; i <= 1; i++){
+        lastStatus[i][0] = touchStatus[i][0]; 
+        lastStatus[i][1] = touchStatus[i][1];
+    }
+
 	if (!digitalReadFast(15))
     {
         Serial.println(micros() - lastmicroS);

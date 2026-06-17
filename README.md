@@ -24,28 +24,56 @@ English version | [繁體中文版本 (Traditional Chinese version)](README_zh-T
 
 ## BOM
 
+1. [PCB](./PCB/FormalPCB/Touchpad.kicad_pcb) × 2
+   1. CY8CMBR3116 × 1
+   2. 0.1uF × 2
+   3. 1uF × 1
+   4. 2.2nF X7R × 1
+   5. 4.7kΩ × 2
+   6. 560Ω × 16
+2. IR LED × 6 `! Function haven't implented yet`
+3. ~IRM-3638~ TSSP58038 IR reciever × 6 `! Function haven't implented yet, likely to switch to TSSP58038`
+4. RP2040-Zero × 1 (Refer as RP2040 below)
+   1. Machined Pin Header 9 pin × 2
+   2. Machined Female Header 9 pin × 2
+   3. Machined Pin Header 5 pin × 1
+   4. Machined Female Header 5 pin × 1
+5. [Acrylic case](./Case/Acrylic.dwg) for touch pads (2mm thick) × 2
+   1. [Acrylic cap](./Case/AcrylicCap.dwg) for covering CY8CMBR3116 (2mm thick) × 1
+   2. M2 screw (10mm length) × 6
+      1. M2 Hex Nut × 6
+      2. M2 Washer (Rubber recommended) × 6
+   3. M3 screw (≥9mm length) × 7
+      1. M3 Hex Nut × 7
+      2. M3 Washer (Rubber recommended) × 7
+
+    2mm thick acrylic × 2 + 1.6mm PCB = 5.6mm thick in total.
+    5.6mm + 1.6mm M2 nut + 0.5mm rubber washer = 7.7mm
+    5.6mm + 2.4mm M3 nut + 0.5mm rubber washer = 8.5mm
+<!-- TODO: update IR info here after IR has been implented -->
+
 <details>
 
 <summary>Using test PCB</summary>
 
 1. Testing PCB [motherboard type B](./PCB/TestPCB/TestMotherboardB.kicad_pcb) × 1
-1. Testing PCB [childboard type B](./PCB/TestPCB/TestChildboardB.kicad_pcb) × 1
+2. Testing PCB [childboard type B](./PCB/TestPCB/TestChildboardB.kicad_pcb) × 1
    1. CY8CMBR3116 w/ [DIP convertion board](./PCB/CY8CMBR3116_PCB/CY8CMBR3116_PCB.kicad_pro) × 1 `! The KiCad project is created with KiCad version 9 or 8.`
    2. 0.1uF × 2
    3. 1uF × 1
    4. 2.2nF X7R × 1
    5. 4.7kΩ × 2
    6. 560Ω × 16
-2. IR LED `! Function haven't implented yet`
-3. ~IRM-3638~ TSSP58038 IR reciever `! Function haven't implented yet, likely to switch to TSSP58038`
-4. RP2040-Zero × 1
+3. IR LED `! Function haven't implented yet`
+4. ~IRM-3638~ TSSP58038 IR reciever `! Function haven't implented yet, likely to switch to TSSP58038`
+5. RP2040-Zero × 1
    (Refer as RP2040 below)
 
 </details>
 
 <details>
 
-<summary>Using prototype touchpad</summary>
+<summary>Using handmade prototype touchpad</summary>
 
 1. CY8CMBR3116 w/ DIP convertion board × 1
    1. 0.1uF × 2

@@ -7751,6 +7751,18 @@
 		)
 		(embedded_fonts no)
 	)
+	(gr_poly
+		(pts
+			(xy 21.971 3.683) (xy 22.733 3.683) (xy 22.352 4.318)
+		)
+		(stroke
+			(width 0.1)
+			(type solid)
+		)
+		(fill yes)
+		(layer "F.SilkS")
+		(uuid "35a37520-2767-4958-8957-c4636cd59dbe")
+	)
 	(gr_rect
 		(start 0 0)
 		(end 57.531 38.238)
@@ -7761,6 +7773,78 @@
 		(fill no)
 		(layer "Edge.Cuts")
 		(uuid "1a59ed56-94aa-4220-b68d-5477bca618d6")
+	)
+	(gr_text "Din = Data = DS\nLatch = ST_CP\nCLK = Clock = SH_CP"
+		(at 32.258 0.508 0)
+		(layer "F.SilkS")
+		(uuid "b37ba36f-5009-4fe3-87e8-ce21b1a244dd")
+		(effects
+			(font
+				(size 0.75 0.75)
+				(thickness 0.1)
+			)
+			(justify left top)
+		)
+	)
+	(gr_text "Din"
+		(at 19.812 3.429 0)
+		(layer "F.SilkS")
+		(uuid "9723aa02-1c01-42f8-bf32-93c9e3e791a4")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.1)
+			)
+			(justify top)
+		)
+	)
+	(gr_text "Latch"
+		(at 22.352 4.572 0)
+		(layer "F.SilkS")
+		(uuid "16a1e5d7-140d-410f-9aab-10b8c8a9380e")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.1)
+			)
+			(justify top)
+		)
+	)
+	(gr_text "CLK"
+		(at 24.892 3.429 0)
+		(layer "F.SilkS")
+		(uuid "39d8c834-0a3e-427d-988a-33816de691b1")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.1)
+			)
+			(justify top)
+		)
+	)
+	(gr_text "+"
+		(at 27.432 3.429 0)
+		(layer "F.SilkS")
+		(uuid "6c1bac78-3b1c-4214-bb1d-80814b4399ed")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.1)
+			)
+			(justify top)
+		)
+	)
+	(gr_text "GND"
+		(at 29.972 3.429 0)
+		(layer "F.SilkS")
+		(uuid "2adb33df-333b-481e-84fc-47ee72745f3a")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.1)
+			)
+			(justify top)
+		)
 	)
 	(segment
 		(start 28.388264 17.6925)

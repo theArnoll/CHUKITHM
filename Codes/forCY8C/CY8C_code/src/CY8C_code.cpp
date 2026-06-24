@@ -3,6 +3,9 @@
 #include "NKRO_TinyUSB.h" // TinyUSB NKRO
 #include <Adafruit_NeoPixel.h>
 #include <SPI.h>
+#include "hardware/pwm.h" // RP2040 Hardware PWM
+
+#define elif else if
 
 #define I2C_ADDRESS 0x51     //I2C Address of the Cypress IC (0x37 is default)
 #define REQUEST_TIMEOUT 40   //After how many request is a Timeout triggered
@@ -110,7 +113,7 @@ void setup() {
     Wire.begin();   
     Wire.setClock(400000);  
 
-    // 【修正 2】加上 50ms 延遲，給觸控 IC 喚醒時間
+    // Wait for IC to wake up
     delay(50);
 
     pinMode(15, INPUT_PULLUP); //7
@@ -123,7 +126,7 @@ void setup() {
         while (!Serial && millis() - sysTime < 2000) { delay(1); }  
         if (millis() - sysTime >= 2000)  
         {
-            pixels.setPixelColor(0, pixels.Color(0, 255, 255)); pixels.show();
+            pixels.setPixelColor(0, pixels.Color(0, 255, 255)); pixels.show(); // Sky blue  
             delay(200); 
         }
     }
@@ -140,38 +143,21 @@ void setup() {
     // 【修正 4】無條件初始化 KB.begin()，不再被 Pin 14 開關綁死，否則 USB 無法正確掛載鍵盤
     KB.begin();
 
-    runSingleDotMarquee(100);
-    delay(500); 
+    runSingleDotMarquee(50);
+    delay(100); 
     runDualBarGraph(50);
 
-    Serial.println("--- 讀取晶片硬體自檢報告 ---");
+    // IR Pins
+    for (uint8_t re = 2; re <= 7; re++)  // TSSP Pins
+        pinMode(re, INPUT_PULLUP);
 
-    Wire.beginTransmission(0x51); Wire.write(0x98); Wire.endTransmission(false); Wire.requestFrom(0x51, 2);
-    if (Wire.available() == 2) {
-        Serial.print("Cp > 45pF (CS0~CS7)  : "); Serial.println(Wire.read(), BIN);
-        Serial.print("Cp > 45pF (CS8~CS15) : "); Serial.println(Wire.read(), BIN);
-    }
-    Wire.beginTransmission(0x51); Wire.write(0x9E); Wire.endTransmission(false); Wire.requestFrom(0x51, 2);
-    if (Wire.available() == 2) {
-        Serial.print("對感應器短路 (CS0~CS7)   : "); Serial.println(Wire.read(), BIN);
-        Serial.print("對感應器短路 (CS8~CS15)  : "); Serial.println(Wire.read(), BIN);
-    }
-    Wire.beginTransmission(0x51); Wire.write(0x9A); Wire.endTransmission(false); Wire.requestFrom(0x51, 2);
-    if (Wire.available() == 2) {
-        Serial.print("對高短路 (CS0~CS7)   : "); Serial.println(Wire.read(), BIN);
-        Serial.print("對高短路 (CS8~CS15)  : "); Serial.println(Wire.read(), BIN);
-    }
-    Wire.beginTransmission(0x51); Wire.write(0x9C); Wire.endTransmission(false); Wire.requestFrom(0x51, 2);
-    if (Wire.available() == 2) {
-        Serial.print("對地短路 (CS0~CS7)   : "); Serial.println(Wire.read(), BIN);
-        Serial.print("對地短路 (CS8~CS15)  : "); Serial.println(Wire.read(), BIN);
-    }
-    Wire.beginTransmission(0x51); Wire.write(0x97); Wire.endTransmission(false); Wire.requestFrom(0x51, 1);
-    if (Wire.available() == 1) {
-        Serial.print("晶片判定存活的按鍵總數: ");
-        Serial.println(Wire.read() & 0x1F); 
-    }
-    Serial.println("EOF");
+    gpio_set_function(8, GPIO_FUNC_PWM);
+    uint slice_num = pwm_gpio_to_slice_num(8);  // Get Hardware PWM slice number
+    pwm_set_clkdiv(slice_num, 125.0f);          // Set clock to 1MHz (125MHz / 125)
+    pwm_set_wrap(slice_num, 26);                // Set frequency to ~38.4kHz (1MHz / 26)
+    pwm_set_chan_level(slice_num, pwm_gpio_to_channel(8), 2);  // Set duty cycle to 2/26 (=1/13)
+    pwm_set_enabled(slice_num, true);           // Start Hardware PWM
+
     digitalWrite(14, LOW);
     Serial.println("Start Program");
 }
@@ -182,16 +168,20 @@ char keymap[2][2][8] = {  //   0    1    2    3    4    5    6    7
                         {   { '5', 't', 'g', 'b', ',', 'k', 'i', '8' } , // IC 2
                             { 'm', 'j', 'u', '7', 'n', 'h', 'y', '6' }   } };
 uint8_t lastStatus[2][2] = { { 0, 0 }, { 0, 0 } }; // 2 ICs
+char IRkeymap[6] = { '.', 'l', 'o', '9', 'p', '0' };
+bool lastIRstatus[6] = { 0 };
 
 unsigned long lastmicroS = micros();
 
 void loop() {
     uint8_t touchStatus[2][2];
+    bool IRstatus[6];
     requestTouchStatus(touchStatus);
 
     // 【修正 5】增加 needToSend 標記，避免每秒瘋狂呼叫 KB.send() 塞爆 USB 導致卡死
     bool needToSend = false;
 
+    //  Serial print status
     for (uint8_t ICsel = 0; ICsel <= 1; ICsel++)
     {   
         // 【修正 6】徹底刪除 digitalWrite(15, 0) 避免破壞腳位的 INPUT_PULLUP 狀態
@@ -210,6 +200,7 @@ void loop() {
         }
     }
     
+    // Keyboard events
     for (uint8_t ICsel = 0; ICsel <= 1; ICsel++)
     {   
         // 【修正 6】徹底刪除 digitalWrite(14, 0)
@@ -238,20 +229,43 @@ void loop() {
         }  // end if
     } // end for
 
-    // 【修正 5 續】只有真的發生按鍵變化時，才把訊號推給 USB
-    if (needToSend) {
-        KB.send();
+    for (uint8_t re = 0; re < 6; re++)
+    {
+        IRstatus[re] = digitalReadFast(2 + re);
+
+        if (IRstatus[re] != lastIRstatus[re]) 
+        {                                      //  // * in TSSP, 0 = blocked and no IR input, 1 = Detected IR
+            if (lastIRstatus[re] > IRstatus[re]) // 1 -> 0
+                KB.release(IRkeymap[re]);
+            elif (lastIRstatus[re] < IRstatus[re]) // 0 -> 1
+                KB.add(IRkeymap[re]);
+            needToSend = true;
+        }
     }
 
-    // 【修正 7】正確使用迴圈更新所有 IC 的上次狀態，原版漏了第二顆 IC 會導致卡鍵或邏輯錯誤
-    for(uint8_t i = 0; i <= 1; i++){
-        lastStatus[i][0] = touchStatus[i][0]; 
-        lastStatus[i][1] = touchStatus[i][1];
+    // 當 Pin 15 接地時，依照您提供的測試碼格式輸出紅外線狀態
+    // if (digitalReadFast(15) == LOW)
+    // {
+        Serial.print("IR State: | ");
+        for (uint8_t re = 0; re < 6; re++)
+        {
+            Serial.print((int)IRstatus[re]);
+            Serial.print(" | ");
+        }
+        Serial.println();
+    // }
+
+    if (needToSend) KB.send();
+
+    for(uint8_t ICsel = 0; ICsel <= 1; ICsel++)
+    {   for(uint8_t reg = 0; reg <= 1; reg++)
+            lastStatus[ICsel][reg] = touchStatus[ICsel][reg];
     }
+    for(uint8_t re = 0; re < 6; re++)
+        lastIRstatus[re] = IRstatus[re];
 
 	if (!digitalReadFast(15))
-    {
-        Serial.println(micros() - lastmicroS);
+    {   Serial.println(micros() - lastmicroS);
         lastmicroS = micros();
     }
 }

@@ -2,6 +2,9 @@
 
 English version | [繁體中文版本 (Traditional Chinese version)](README_zh-TW.md)
 
+![PCB Front image](./Images/PCBfront.jpg)
+![PCB Back image](./Images/PCBback.jpg)
+
 ## Table of Contents
 
 - [A touch controller based on a Japanese Arcade](#a-touch-controller-based-on-a-japanese-arcade)
@@ -219,3 +222,5 @@ This project incorporates AI-assisted development tools to optimize workflow and
   * Gemini models and Gemma 4 models on Google AI Studio is used, with paid API key used to ensure legal data privacy.
 
 All AI-generated code has been manually reviewed, refactored, and tested to ensure logic integrity and project-specific requirements.
+
+<img class="thumbnail" repo="theArnoll/CHUKITHM" src="https://opengraph.githubassets.com/ccb10a75e1ee4faa1ec386888c72d445bfb613b2/theArnoll/CHUKITHM" width="50%">

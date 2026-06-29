@@ -2,7 +2,10 @@
 
 [English version](README.md) | 繁體中文版本
 
-以 gemma4:e4b 模型翻譯自英文
+此版本幾乎以 gemma4:e4b 模型翻譯自英文
+
+![PCB 正面影像](./Images/PCBfront.jpg)
+![PCB 背面影像](./Images/PCBback.jpg)
 
 ## 目錄
 
@@ -185,3 +188,5 @@
   * 使用 Google AI Studio 中的 Gemini 和 Gemma 4 模型，並使用付費 API 金鑰確保資料隱私權。
 
 所有由 AI 生成的程式碼都經過人工審閱、重構和測試，以確保邏輯完整性以及專案特定的需求要求。
+
+<img class="thumbnail" repo="theArnoll/CHUKITHM" src="https://opengraph.githubassets.com/ccb10a75e1ee4faa1ec386888c72d445bfb613b2/theArnoll/CHUKITHM" width="50%">

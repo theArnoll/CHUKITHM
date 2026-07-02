@@ -39,7 +39,6 @@ void printError(uint8_t errorCode)
 
 void requestTouchStatus(uint8_t statusStorage[2][2])
 {
-    // 【修正 1】大小必須是 [2][2]，原為 [0][2] 會造成嚴重記憶體越界當機
     uint8_t touchStatusBuffer[2][2];
 
     uint8_t error = touchIC.get_BUTTON_STAT(touchStatusBuffer[0]);
@@ -121,7 +120,6 @@ void setup() {
     
     if (digitalReadFast(15))
     {
-        // 【修正 3】將 micros() 改為 millis() 搭配 uint32_t，並在 while 內加入 delay(1) 避免獨佔 CPU 導致 USB 卡死
         uint32_t sysTime = millis();
         while (!Serial && millis() - sysTime < 2000) { delay(1); }  
         if (millis() - sysTime >= 2000)  
@@ -140,7 +138,7 @@ void setup() {
     SPI1.begin();
     pinMode(12, OUTPUT);
 
-    // 【修正 4】無條件初始化 KB.begin()，不再被 Pin 14 開關綁死，否則 USB 無法正確掛載鍵盤
+    // TODO: SW toggle Keyboard output
     KB.begin();
 
     runSingleDotMarquee(50);
@@ -155,7 +153,7 @@ void setup() {
     uint slice_num = pwm_gpio_to_slice_num(8);  // Get Hardware PWM slice number
     pwm_set_clkdiv(slice_num, 125.0f);          // Set clock to 1MHz (125MHz / 125)
     pwm_set_wrap(slice_num, 26);                // Set frequency to ~38.4kHz (1MHz / 26)
-    pwm_set_chan_level(slice_num, pwm_gpio_to_channel(8), 2);  // Set duty cycle to 2/26 (=1/13)
+    pwm_set_chan_level(slice_num, pwm_gpio_to_channel(8), 13);  // Set duty cycle to 2/26 (=1/13)
     pwm_set_enabled(slice_num, true);           // Start Hardware PWM
 
     digitalWrite(14, LOW);
@@ -178,14 +176,11 @@ void loop() {
     bool IRstatus[6];
     requestTouchStatus(touchStatus);
 
-    // 【修正 5】增加 needToSend 標記，避免每秒瘋狂呼叫 KB.send() 塞爆 USB 導致卡死
     bool needToSend = false;
 
     //  Serial print status
     for (uint8_t ICsel = 0; ICsel <= 1; ICsel++)
-    {   
-        // 【修正 6】徹底刪除 digitalWrite(15, 0) 避免破壞腳位的 INPUT_PULLUP 狀態
-        if(digitalReadFast(15) == LOW)
+    {   if(digitalReadFast(15) == LOW)
         {
             Serial.print(ICsel + 1); Serial.print(": |");
             for (uint8_t re = 0; re < 2; re++)
@@ -202,9 +197,7 @@ void loop() {
     
     // Keyboard events
     for (uint8_t ICsel = 0; ICsel <= 1; ICsel++)
-    {   
-        // 【修正 6】徹底刪除 digitalWrite(14, 0)
-        if (digitalReadFast(14) == LOW && (lastStatus[ICsel][0] != touchStatus[ICsel][0] || lastStatus[ICsel][1] != touchStatus[ICsel][1]))
+    {   if (digitalReadFast(14) == LOW && (lastStatus[ICsel][0] != touchStatus[ICsel][0] || lastStatus[ICsel][1] != touchStatus[ICsel][1]))
         {   for (uint8_t bfrsel = 0; bfrsel <= 1; bfrsel++)
             {   for (int pointer = 0; pointer < 8; pointer++)
                 {   uint8_t pressed = touchStatus[ICsel][bfrsel] >> pointer & 0b00000001,
@@ -213,14 +206,14 @@ void loop() {
                     if(pressed && (pressed != lastPressed))
                     {
                         KB.add(keymap[ICsel][bfrsel][pointer]);
-                        needToSend = true; // 標記需要發送
+                        needToSend = true;
                         if(!digitalReadFast(15)) Serial.println(keymap[ICsel][bfrsel][pointer]);
                     }
                     else {
                         if(pressed != lastPressed)
                         {
                             KB.release(keymap[ICsel][bfrsel][pointer]);
-                            needToSend = true; // 標記需要發送
+                            needToSend = true;
                             if(!digitalReadFast(15)) { Serial.print("-"); Serial.println(keymap[ICsel][bfrsel][pointer]); }
                         }
                     }
@@ -243,7 +236,6 @@ void loop() {
         }
     }
 
-    // 當 Pin 15 接地時，依照您提供的測試碼格式輸出紅外線狀態
     // if (digitalReadFast(15) == LOW)
     // {
         Serial.print("IR State: | ");
